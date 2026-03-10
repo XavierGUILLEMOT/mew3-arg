@@ -2,22 +2,53 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>YOU ARE WATCHING NOW</title>
-<link rel="stylesheet" href="style.css">
+
+<title>MEW3 // ACCESS NODE</title>
+
 <link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-<div class="terminal">
+<div class="container">
 
-<h1>▣ ENTER PASSWORD</h1>
+<div class="logo">
+MEW3
+</div>
 
-<input id="answer" placeholder="Access key">
+<div class="access-box">
 
-<button onclick="checkKey()">VERIFY</button>
+<h2>ENTER CODE</h2>
 
-<p id="result"></p>
+<input id="codeInput" placeholder="ACCESS KEY">
+
+<button onclick="verifyCode()">VERIFY</button>
+
+<p id="message"></p>
+
+</div>
+
+<div class="counter">
+
+▣ <span id="subjectCount">0</span> SUBJECTS IDENTIFIED
+
+</div>
+
+<div class="leaderboard">
+
+<h3>RECENT SUBJECTS</h3>
+
+<ul id="playersList">
+
+<li>...</li>
+<li>...</li>
+<li>...</li>
+
+</ul>
+
+</div>
 
 </div>
 
@@ -33,7 +64,7 @@
 
 <input id="email" placeholder="Email">
 
-<button onclick="register()">REGISTER</button>
+<button onclick="register()">WATCH</button>
 
 </div>
 
@@ -42,13 +73,7 @@
 <script src="script.js"></script>
 
 </body>
-
 </html>
-
-
-
-
-
 
 
 
