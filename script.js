@@ -1,52 +1,22 @@
-async function checkKey(){
+function verifyCode(){
 
-const answer = document.getElementById("answer").value
+const code = document.getElementById("codeInput").value
 
-const res = await fetch("/api/check",{
- method:"POST",
- headers:{ "Content-Type":"application/json" },
- body:JSON.stringify({answer})
-})
-
-const data = await res.json()
-
-if(data.success){
-
- document.getElementById("popup").style.display = "flex"
-
+if(code === "panopticon"){
+document.getElementById("popup").style.display="flex"
 }else{
-
- document.getElementById("result").innerText = "ACCESS DENIED"
-
+document.getElementById("message").innerText="ACCESS DENIED"
 }
 
 }
 
-async function register(){
+function register(){
 
 const username = document.getElementById("username").value
-const email = document.getElementById("email").value
 
-const res = await fetch("/api/register",{
- method:"POST",
- headers:{ "Content-Type":"application/json" },
- body:JSON.stringify({username,email})
-})
+document.getElementById("popup").style.display="none"
 
-const data = await res.json()
-
-if(data.success){
-
- document.getElementById("popup").style.display = "none"
-
- document.getElementById("result").innerText =
- "SUBJECT REGISTERED — ID #" + data.position
-
-}else{
-
- document.getElementById("result").innerText =
- data.message
-
-}
+document.getElementById("message").innerText =
+"YOU HAVE THE EYE. CHECK YOUR EMAIL."
 
 }
