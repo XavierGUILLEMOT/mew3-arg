@@ -9,6 +9,55 @@ const playlist = [
 ];
 
 let currentTrack = null;
+let pendingCode = null;
+const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
+  ? window.APP_CONFIG.API_BASE_URL.replace(/\/$/, "")
+  : "https://api.mew3.online";
+
+async function apiFetch(path, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      "content-type": "application/json",
+      ...(options.headers || {}),
+    },
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const err = new Error(data.error || "api_error");
+    err.code = data.error || "api_error";
+    throw err;
+  }
+  return data;
+}
+
+function updateSubjectsList(usernames) {
+  const list = document.getElementById("playersList");
+  list.innerHTML = "";
+
+  if (!usernames.length) {
+    const li = document.createElement("li");
+    li.innerText = "...";
+    list.appendChild(li);
+    return;
+  }
+
+  usernames.forEach((name) => {
+    const li = document.createElement("li");
+    li.innerText = name;
+    list.appendChild(li);
+  });
+}
+
+async function refreshStats() {
+  try {
+    const stats = await apiFetch("/api/stats", { method: "GET", headers: {} });
+    document.getElementById("subjectCount").innerText = String(stats.total || 0);
+    updateSubjectsList((stats.recent || []).map((r) => r.username));
+  } catch (_e) {
+    // Keep existing UI placeholders when backend is unavailable.
+  }
+}
 
 function calculateAnimationDuration(bpm){
   return (60 / bpm) * 2; // Duration in seconds
@@ -67,27 +116,83 @@ btn.innerText = "🔇"
 window.onload = function(){
 document.getElementById("bgAudio").volume = 0.3
 loadRandomTrack()
+refreshStats()
 }
 
-function verifyCode(){
+async function verifyCode(){
 
 const code = document.getElementById("codeInput").value
+const message = document.getElementById("message")
 
-if(code === "panopticon"){
+if(!code.trim()){
+message.innerText = "ENTER A CODE"
+return
+}
+
+message.innerText = "VERIFYING..."
+
+try{
+await apiFetch("/api/verify-code", {
+method: "POST",
+body: JSON.stringify({ code })
+})
+
+pendingCode = code
+message.innerText = ""
 document.getElementById("popup").style.display="flex"
+}catch(e){
+if(e.code === "exhausted"){
+message.innerText = "CODE EXHAUSTED"
 }else{
-document.getElementById("message").innerText="ACCESS DENIED"
+message.innerText = "ACCESS DENIED"
+}
 }
 
 }
 
-function register(){
+async function register(){
 
 const username = document.getElementById("username").value
+const email = document.getElementById("email").value
+const message = document.getElementById("message")
+
+if(!pendingCode){
+message.innerText = "VERIFY CODE FIRST"
+return
+}
+
+if(!username.trim() || !email.trim()){
+message.innerText = "USERNAME AND EMAIL REQUIRED"
+return
+}
+
+try{
+await apiFetch("/api/register", {
+method: "POST",
+body: JSON.stringify({
+username,
+email,
+code: pendingCode
+})
+})
 
 document.getElementById("popup").style.display="none"
 
-document.getElementById("message").innerText =
+message.innerText =
 "YOU HAVE THE EYE. CHECK YOUR EMAIL."
+
+pendingCode = null
+refreshStats()
+}catch(e){
+if(e.code === "already_claimed"){
+message.innerText = "ALREADY CLAIMED WITH THIS EMAIL"
+}else if(e.code === "invalid_email"){
+message.innerText = "INVALID EMAIL"
+}else if(e.code === "exhausted"){
+message.innerText = "CODE EXHAUSTED"
+}else{
+message.innerText = "REGISTRATION FAILED"
+}
+}
 
 }

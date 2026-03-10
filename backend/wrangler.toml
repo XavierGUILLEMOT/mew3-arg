@@ -1,0 +1,12 @@
+name = "mew3-api"
+main = "src/index.js"
+compatibility_date = "2026-03-10"
+
+[vars]
+ALLOWED_ORIGINS = "https://mew3.online,https://www.mew3.online,https://xavierguillemot.github.io"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "mew3-db"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+migrations_dir = "migrations"
