@@ -358,6 +358,11 @@ background:rgba(0,0,0,0.55);
 backdrop-filter:blur(2px);
 }
 
+.in-app-corner-hint[hidden],
+.in-app-notice[hidden]{
+display:none !important;
+}
+
 .hint-label{
 font-size:10px;
 letter-spacing:1px;
