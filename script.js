@@ -90,7 +90,7 @@ function updateAudioButtonLabel(){
   }
 
   if(!playbackUnlocked && audio.paused){
-    btn.innerText = "START AUDIO";
+    btn.innerText = "START PLAYING";
     return;
   }
 
@@ -155,6 +155,12 @@ document.addEventListener("DOMContentLoaded", function(){
 function toggleMute(){
 const audio = document.getElementById("bgAudio")
 
+if(!playbackUnlocked){
+audio.muted = false
+tryPlayAudio()
+return
+}
+
 if(audio.muted){
 audio.muted = false
 tryPlayAudio()
@@ -168,15 +174,6 @@ window.onload = function(){
 const audio = document.getElementById("bgAudio")
 
 audio.volume = 0.3
-
-const unlockOnFirstInteraction = () => {
-  if(!audio.muted){
-    tryPlayAudio();
-  }
-};
-
-document.addEventListener("pointerdown", unlockOnFirstInteraction, { once: true });
-document.addEventListener("keydown", unlockOnFirstInteraction, { once: true });
 
 updateAudioButtonLabel()
 loadRandomTrack()
