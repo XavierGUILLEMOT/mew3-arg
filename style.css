@@ -246,41 +246,9 @@ button:hover{
 box-shadow:0 0 10px #00ff9c;
 }
 
-.mew3-stage{
-position:relative;
-width:fit-content;
-margin:0 auto 10px;
-}
-
-.mew3-glyphs{
-position:absolute;
-left:50%;
-top:50%;
-width:420px;
-height:260px;
-transform:translate(-50%,-50%);
-pointer-events:none;
-z-index:1;
-opacity:0.55;
-}
-
-.mew3-glyph{
-position:absolute;
-width:110px;
-height:110px;
-background:url("MWHITE.png") center/contain no-repeat;
-filter:drop-shadow(0 0 8px rgba(0,255,156,0.25));
-}
-
-.glyph-0{left:10px; top:20px; transform:rotate(0deg);}
-.glyph-1{right:10px; top:20px; transform:rotate(90deg);}
-.glyph-2{left:65px; bottom:10px; transform:rotate(180deg);}
-.glyph-3{right:65px; bottom:10px; transform:rotate(270deg);}
-
 .mew3-link{
 display:inline-block;
-position:relative;
-z-index:2;
+margin-bottom:12px;
 }
 
 .mew3-link:hover .mew3-image{
@@ -468,19 +436,6 @@ width:94vw;
 max-width:420px;
 margin-top:3vh;
 }
-
-.mew3-glyphs{
-width:320px;
-height:200px;
-}
-
-.mew3-glyph{
-width:82px;
-height:82px;
-}
-
-.glyph-2{left:42px;}
-.glyph-3{right:42px;}
 
 .mew3-image{
 max-width:220px;
