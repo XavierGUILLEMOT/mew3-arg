@@ -32,8 +32,15 @@ function isInAppBrowser(){
 
 function showInAppNotice(){
   const notice = document.getElementById("inAppNotice");
+  const cornerHint = document.getElementById("inAppCornerHint");
+  const inApp = isInAppBrowser();
+
   if(notice){
-    notice.hidden = !isInAppBrowser();
+    notice.hidden = !inApp;
+  }
+
+  if(cornerHint){
+    cornerHint.hidden = !inApp;
   }
 }
 
