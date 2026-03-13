@@ -138,13 +138,13 @@ function applyWidgetVolume(){
 }
 
 function loadTrack(index, autoplay){
-  if(!scWidget){
-    return;
-  }
-
   currentTrackIndex = index;
   currentTrack = playlist[index];
   updateNowPlaying();
+
+  if(!scWidget){
+    return;
+  }
 
   scWidget.load(currentTrack.url, {
     auto_play: Boolean(autoplay),
@@ -186,9 +186,7 @@ async function startPlaying(){
 function loadRandomTrack(){
   const nextIndex = pickRandomTrackIndex();
   if(currentTrackIndex < 0){
-    currentTrackIndex = nextIndex;
-    currentTrack = playlist[currentTrackIndex];
-    updateNowPlaying();
+    loadTrack(nextIndex, false);
     updateAudioButtonLabel();
     return;
   }
@@ -196,8 +194,22 @@ function loadRandomTrack(){
   loadTrack(nextIndex, hasUserStartedAudio);
 }
 
-function nextTrack(){
-  loadRandomTrack();
+async function nextTrack(){
+  if(!playlist.length){
+    return;
+  }
+
+  await ensureWidgetReady().catch(() => {});
+
+  const nextIndex = currentTrackIndex < 0
+    ? 0
+    : (currentTrackIndex + 1) % playlist.length;
+
+  loadTrack(nextIndex, hasUserStartedAudio);
+
+  if(hasUserStartedAudio && scWidget && !isMuted){
+    scWidget.play();
+  }
 }
 
 function toggleMute(){
