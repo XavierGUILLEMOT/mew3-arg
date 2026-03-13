@@ -122,6 +122,8 @@ function renderUsers(users) {
     <tr>
       <td>${u.id}</td>
       <td>${escapeHtml(u.username)}</td>
+      <td>${escapeHtml(u.first_name || "-")}</td>
+      <td>${escapeHtml(u.last_name || "-")}</td>
       <td>${escapeHtml(u.email)}</td>
       <td>${u.claims}</td>
       <td>${u.created_at}</td>
@@ -135,6 +137,8 @@ function renderUsers(users) {
         <tr>
           <th>ID</th>
           <th>Username</th>
+          <th>First Name</th>
+          <th>Last Name</th>
           <th>Email</th>
           <th>Claims</th>
           <th>Created</th>

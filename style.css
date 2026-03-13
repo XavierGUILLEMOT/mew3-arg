@@ -307,6 +307,13 @@ margin-bottom:20px;
 font-size:18px;
 }
 
+.privacy-note{
+font-size:12px;
+line-height:1.45;
+opacity:0.78;
+margin:6px 0 12px;
+}
+
 /* Audio Controls */
 
 .audio-controls{

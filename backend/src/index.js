@@ -61,6 +61,10 @@ function sanitizeEmail(email) {
   return String(email || "").trim().toLowerCase();
 }
 
+function sanitizeNamePart(value) {
+  return String(value || "").trim().slice(0, 80);
+}
+
 function validEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -120,26 +124,38 @@ async function handleVerify(request, env, cors) {
   return json({ ok: true, remaining: result.remaining }, 200, cors);
 }
 
-async function findOrCreateUser(env, username, email) {
-  const existing = await env.DB.prepare(`SELECT id, username FROM users WHERE email = ?`).bind(email).first();
+async function findOrCreateUser(env, username, firstName, lastName, email) {
+  const existing = await env.DB.prepare(
+    `SELECT id, username, first_name, last_name FROM users WHERE email = ?`
+  ).bind(email).first();
   if (existing) {
-    if (existing.username !== username) {
-      await env.DB.prepare(`UPDATE users SET username = ? WHERE id = ?`).bind(username, existing.id).run();
+    if (
+      existing.username !== username ||
+      existing.first_name !== firstName ||
+      existing.last_name !== lastName
+    ) {
+      await env.DB.prepare(
+        `UPDATE users SET username = ?, first_name = ?, last_name = ? WHERE id = ?`
+      ).bind(username, firstName, lastName, existing.id).run();
     }
     return existing.id;
   }
 
-  const created = await env.DB.prepare(`INSERT INTO users (username, email) VALUES (?, ?)`).bind(username, email).run();
+  const created = await env.DB.prepare(
+    `INSERT INTO users (username, first_name, last_name, email) VALUES (?, ?, ?, ?)`
+  ).bind(username, firstName, lastName, email).run();
   return created.meta.last_row_id;
 }
 
 async function handleRegister(request, env, cors) {
   const body = await request.json().catch(() => ({}));
   const username = sanitizeUsername(body.username);
+  const firstName = sanitizeNamePart(body.firstName);
+  const lastName = sanitizeNamePart(body.lastName);
   const email = sanitizeEmail(body.email);
   const code = String(body.code || "").trim();
 
-  if (!username || !email || !code) {
+  if (!username || !firstName || !lastName || !email || !code) {
     return json({ ok: false, error: "missing_fields" }, 400, cors);
   }
   if (!validEmail(email)) {
@@ -151,7 +167,7 @@ async function handleRegister(request, env, cors) {
     return json({ ok: false, error: verification.reason }, 403, cors);
   }
 
-  const userId = await findOrCreateUser(env, username, email);
+  const userId = await findOrCreateUser(env, username, firstName, lastName, email);
 
   const existingClaim = await env.DB.prepare(`SELECT id FROM claims WHERE user_id = ? AND code_id = ?`)
     .bind(userId, verification.codeId)
@@ -295,7 +311,7 @@ async function handleAdminDeleteCode(request, env, cors) {
 async function handleAdminListUsers(url, env, cors) {
   const limit = parseLimit(url.searchParams.get("limit"), 100, 1000);
   const rows = await env.DB.prepare(
-    `SELECT u.id, u.username, u.email, u.created_at, COUNT(c.id) AS claims
+    `SELECT u.id, u.username, u.first_name, u.last_name, u.email, u.created_at, COUNT(c.id) AS claims
      FROM users u
      LEFT JOIN claims c ON c.user_id = u.id
      GROUP BY u.id

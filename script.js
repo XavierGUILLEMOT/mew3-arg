@@ -142,7 +142,7 @@ message.innerText = ""
 document.getElementById("popup").style.display="flex"
 }catch(e){
 if(e.code === "exhausted"){
-message.innerText = "CODE EXHAUSTED"
+message.innerText = "CODE IS ALREADY USED, KEEP WATCHING"
 }else{
 message.innerText = "ACCESS DENIED"
 }
@@ -153,6 +153,8 @@ message.innerText = "ACCESS DENIED"
 async function register(){
 
 const username = document.getElementById("username").value
+const firstName = document.getElementById("firstName").value
+const lastName = document.getElementById("lastName").value
 const email = document.getElementById("email").value
 const message = document.getElementById("message")
 
@@ -161,8 +163,8 @@ message.innerText = "VERIFY CODE FIRST"
 return
 }
 
-if(!username.trim() || !email.trim()){
-message.innerText = "USERNAME AND EMAIL REQUIRED"
+if(!username.trim() || !firstName.trim() || !lastName.trim() || !email.trim()){
+message.innerText = "USERNAME, FIRST NAME, LAST NAME AND EMAIL REQUIRED"
 return
 }
 
@@ -171,6 +173,8 @@ await apiFetch("/api/register", {
 method: "POST",
 body: JSON.stringify({
 username,
+firstName,
+lastName,
 email,
 code: pendingCode
 })
@@ -189,7 +193,7 @@ message.innerText = "ALREADY CLAIMED WITH THIS EMAIL"
 }else if(e.code === "invalid_email"){
 message.innerText = "INVALID EMAIL"
 }else if(e.code === "exhausted"){
-message.innerText = "CODE EXHAUSTED"
+message.innerText = "CODE IS ALREADY USED, KEEP WATCHING"
 }else{
 message.innerText = "REGISTRATION FAILED"
 }
