@@ -14,6 +14,7 @@ let hasUserStartedAudio = false;
 let scWidget = null;
 let scReady = false;
 let playbackConfirmed = false;
+let isAudioLoading = false;
 let isMuted = false;
 const SOUND_VOLUME = 35;
 let pendingCode = null;
@@ -99,6 +100,11 @@ function updateAudioButtonLabel(){
     return;
   }
 
+  if(isAudioLoading){
+    btn.innerText = "LOADING AUDIO...";
+    return;
+  }
+
   if(isMuted){
     btn.innerText = "AUDIO OFF";
   }else{
@@ -127,6 +133,8 @@ function ensureWidgetReady(){
 
     scWidget.bind(window.SC.Widget.Events.PLAY, () => {
       playbackConfirmed = true;
+      isAudioLoading = false;
+      updateAudioButtonLabel();
     });
 
     scWidget.bind(window.SC.Widget.Events.PAUSE, () => {
@@ -137,6 +145,36 @@ function ensureWidgetReady(){
       reject(new Error("soundcloud_widget_error"));
     });
   });
+}
+
+function requestPlayWithRetries(){
+  if(!scWidget || isMuted){
+    return;
+  }
+
+  isAudioLoading = true;
+  updateAudioButtonLabel();
+
+  const retryDelays = [0, 300, 900, 1800];
+  retryDelays.forEach((delay) => {
+    setTimeout(() => {
+      if(!scWidget || isMuted || playbackConfirmed){
+        return;
+      }
+      try{
+        scWidget.play();
+      }catch(_e){
+        // Keep silent and continue retries.
+      }
+    }, delay);
+  });
+
+  setTimeout(() => {
+    if(!playbackConfirmed){
+      isAudioLoading = false;
+      updateAudioButtonLabel();
+    }
+  }, 2200);
 }
 
 function applyWidgetVolume(){
@@ -177,6 +215,8 @@ async function startPlaying(){
   hasUserStartedAudio = true;
   isMuted = false;
   playbackConfirmed = false;
+  isAudioLoading = true;
+  updateAudioButtonLabel();
 
   await ensureWidgetReady();
   if(currentTrackIndex < 0){
@@ -185,18 +225,7 @@ async function startPlaying(){
 
   loadTrack(currentTrackIndex, true);
 
-  try{
-    scWidget.play();
-    // On some mobile browsers, first play attempt can be delayed or dropped.
-    // A short retry keeps UX as a single tap.
-    setTimeout(() => {
-      if(!isMuted && !playbackConfirmed && scWidget){
-        scWidget.play();
-      }
-    }, 250);
-  }catch(_e){
-    // Keep silent; play can still be blocked in some browsers until a direct interaction.
-  }
+  requestPlayWithRetries();
   updateAudioButtonLabel();
 }
 
@@ -225,7 +254,7 @@ async function nextTrack(){
   loadTrack(nextIndex, hasUserStartedAudio);
 
   if(hasUserStartedAudio && scWidget && !isMuted){
-    scWidget.play();
+    requestPlayWithRetries();
   }
 }
 
@@ -236,16 +265,14 @@ return;
 }
 
 if(!playbackConfirmed && !isMuted){
-  if(scWidget){
-    scWidget.play();
-  }
+  requestPlayWithRetries();
   return;
 }
 
 isMuted = !isMuted;
 applyWidgetVolume();
 if(!isMuted && scWidget){
-  scWidget.play();
+  requestPlayWithRetries();
 }
 updateAudioButtonLabel();
 }
