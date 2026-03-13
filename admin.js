@@ -2,6 +2,10 @@ const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
   ? window.APP_CONFIG.API_BASE_URL.replace(/\/$/, "")
   : "https://api.mew3.online";
 
+const API_FALLBACK_URL = (window.APP_CONFIG && window.APP_CONFIG.ADMIN_API_FALLBACK_URL)
+  ? window.APP_CONFIG.ADMIN_API_FALLBACK_URL.replace(/\/$/, "")
+  : "https://mew3-api.mail-xavierguillemot.workers.dev";
+
 const tokenInput = document.getElementById("adminToken");
 const authStatus = document.getElementById("authStatus");
 const createStatus = document.getElementById("codeCreateStatus");
@@ -25,20 +29,34 @@ async function adminFetch(path, options = {}) {
     throw new Error("Missing admin token");
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const requestOptions = {
     ...options,
     headers: {
       "content-type": "application/json",
       "authorization": `Bearer ${token}`,
       ...(options.headers || {}),
     },
-  });
+  };
 
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data.error || "request_failed");
+  async function doRequest(baseUrl) {
+    const response = await fetch(`${baseUrl}${path}`, requestOptions);
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || `http_${response.status}`);
+    }
+    return data;
   }
-  return data;
+
+  try {
+    return await doRequest(API_BASE_URL);
+  } catch (e) {
+    // Network-level failures can happen on custom-domain edge rules; fallback to workers.dev.
+    if (e && e.message === "Failed to fetch" && API_FALLBACK_URL && API_FALLBACK_URL !== API_BASE_URL) {
+      setStatus(authStatus, "Primary API unreachable, retrying via fallback...", true);
+      return doRequest(API_FALLBACK_URL);
+    }
+    throw e;
+  }
 }
 
 function escapeHtml(input) {
