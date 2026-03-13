@@ -83,3 +83,27 @@ curl -X POST "https://api.mew3.online/api/admin/codes" \
 - `POST /api/verify-code`
 - `POST /api/register`
 - `POST /api/admin/codes` (admin)
+- `GET /api/admin/codes` (admin)
+- `POST /api/admin/codes/set-max` (admin)
+- `POST /api/admin/codes/set-active` (admin)
+- `POST /api/admin/codes/delete` (admin)
+- `GET /api/admin/users` (admin)
+- `POST /api/admin/users/delete` (admin)
+- `GET /api/admin/claims` (admin)
+
+## Panneau admin
+
+Le front statique inclut `admin.html` (racine du site). Ouvre:
+
+- `https://mew3.online/admin.html`
+
+Puis colle ton `ADMIN_TOKEN` dans le champ "Admin Token".
+
+Le panneau permet:
+
+- creation/mise a jour d'un code
+- modification du `maxClaims`
+- activation/desactivation d'un code
+- suppression d'un code
+- listing/suppression d'utilisateurs
+- listing des derniers claims

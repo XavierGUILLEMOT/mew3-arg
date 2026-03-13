@@ -8,6 +8,10 @@ function json(data, status = 200, headers = {}) {
   });
 }
 
+function unauthorized(cors) {
+  return json({ ok: false, error: "unauthorized" }, 401, cors);
+}
+
 function getAllowedOrigins(env) {
   return (env.ALLOWED_ORIGINS || "")
     .split(",")
@@ -25,6 +29,22 @@ function corsHeaders(origin, env) {
     "access-control-max-age": "86400",
     vary: "Origin",
   };
+}
+
+function parseLimit(value, fallback = 100, max = 500) {
+  const n = Number.parseInt(String(value || ""), 10);
+  if (!Number.isFinite(n) || n < 1) return fallback;
+  return Math.min(n, max);
+}
+
+function readBearerToken(request) {
+  const auth = request.headers.get("authorization") || "";
+  return auth.replace(/^Bearer\s+/i, "").trim();
+}
+
+function isAdminAuthorized(request, env) {
+  const token = readBearerToken(request);
+  return Boolean(env.ADMIN_TOKEN) && token === env.ADMIN_TOKEN;
 }
 
 async function sha256Hex(input) {
@@ -184,12 +204,6 @@ async function handleStats(env, cors) {
 }
 
 async function handleCreateCode(request, env, cors) {
-  const auth = request.headers.get("authorization") || "";
-  const token = auth.replace(/^Bearer\s+/i, "").trim();
-  if (!env.ADMIN_TOKEN || token !== env.ADMIN_TOKEN) {
-    return json({ ok: false, error: "unauthorized" }, 401, cors);
-  }
-
   const body = await request.json().catch(() => ({}));
   const code = String(body.code || "").trim();
   const label = String(body.label || "").trim().slice(0, 120);
@@ -210,6 +224,120 @@ async function handleCreateCode(request, env, cors) {
   return json({ ok: true }, 201, cors);
 }
 
+async function handleAdminListCodes(env, cors) {
+  const rows = await env.DB.prepare(
+    `SELECT id, label, max_claims, claims_count, is_active, created_at
+     FROM access_codes
+     ORDER BY id DESC`
+  ).all();
+
+  return json({ ok: true, codes: rows.results || [] }, 200, cors);
+}
+
+async function handleAdminSetCodeMax(request, env, cors) {
+  const body = await request.json().catch(() => ({}));
+  const id = Number.parseInt(String(body.id || ""), 10);
+  const maxClaims = Number.parseInt(String(body.maxClaims || ""), 10);
+
+  if (!Number.isFinite(id) || id < 1 || !Number.isFinite(maxClaims) || maxClaims < 1) {
+    return json({ ok: false, error: "invalid_payload" }, 400, cors);
+  }
+
+  const result = await env.DB.prepare(`UPDATE access_codes SET max_claims = ? WHERE id = ?`)
+    .bind(maxClaims, id)
+    .run();
+
+  if (!result.meta || result.meta.changes < 1) {
+    return json({ ok: false, error: "not_found" }, 404, cors);
+  }
+
+  return json({ ok: true }, 200, cors);
+}
+
+async function handleAdminSetCodeActive(request, env, cors) {
+  const body = await request.json().catch(() => ({}));
+  const id = Number.parseInt(String(body.id || ""), 10);
+  const isActive = body.isActive === true || body.isActive === 1 || body.isActive === "1" ? 1 : 0;
+
+  if (!Number.isFinite(id) || id < 1) {
+    return json({ ok: false, error: "invalid_payload" }, 400, cors);
+  }
+
+  const result = await env.DB.prepare(`UPDATE access_codes SET is_active = ? WHERE id = ?`)
+    .bind(isActive, id)
+    .run();
+
+  if (!result.meta || result.meta.changes < 1) {
+    return json({ ok: false, error: "not_found" }, 404, cors);
+  }
+
+  return json({ ok: true }, 200, cors);
+}
+
+async function handleAdminDeleteCode(request, env, cors) {
+  const body = await request.json().catch(() => ({}));
+  const id = Number.parseInt(String(body.id || ""), 10);
+
+  if (!Number.isFinite(id) || id < 1) {
+    return json({ ok: false, error: "invalid_payload" }, 400, cors);
+  }
+
+  const result = await env.DB.prepare(`DELETE FROM access_codes WHERE id = ?`).bind(id).run();
+  if (!result.meta || result.meta.changes < 1) {
+    return json({ ok: false, error: "not_found" }, 404, cors);
+  }
+
+  return json({ ok: true }, 200, cors);
+}
+
+async function handleAdminListUsers(url, env, cors) {
+  const limit = parseLimit(url.searchParams.get("limit"), 100, 1000);
+  const rows = await env.DB.prepare(
+    `SELECT u.id, u.username, u.email, u.created_at, COUNT(c.id) AS claims
+     FROM users u
+     LEFT JOIN claims c ON c.user_id = u.id
+     GROUP BY u.id
+     ORDER BY u.id DESC
+     LIMIT ?`
+  )
+    .bind(limit)
+    .all();
+
+  return json({ ok: true, users: rows.results || [] }, 200, cors);
+}
+
+async function handleAdminDeleteUser(request, env, cors) {
+  const body = await request.json().catch(() => ({}));
+  const id = Number.parseInt(String(body.id || ""), 10);
+
+  if (!Number.isFinite(id) || id < 1) {
+    return json({ ok: false, error: "invalid_payload" }, 400, cors);
+  }
+
+  const result = await env.DB.prepare(`DELETE FROM users WHERE id = ?`).bind(id).run();
+  if (!result.meta || result.meta.changes < 1) {
+    return json({ ok: false, error: "not_found" }, 404, cors);
+  }
+
+  return json({ ok: true }, 200, cors);
+}
+
+async function handleAdminListClaims(url, env, cors) {
+  const limit = parseLimit(url.searchParams.get("limit"), 100, 1000);
+  const rows = await env.DB.prepare(
+    `SELECT c.id, c.created_at, c.user_agent, u.username, u.email, ac.label
+     FROM claims c
+     JOIN users u ON u.id = c.user_id
+     JOIN access_codes ac ON ac.id = c.code_id
+     ORDER BY c.id DESC
+     LIMIT ?`
+  )
+    .bind(limit)
+    .all();
+
+  return json({ ok: true, claims: rows.results || [] }, 200, cors);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -221,6 +349,10 @@ export default {
 
     if (url.pathname === "/api/health") {
       return json({ ok: true }, 200, cors);
+    }
+
+    if (url.pathname.startsWith("/api/admin/") && !isAdminAuthorized(request, env)) {
+      return unauthorized(cors);
     }
 
     if (request.method === "POST" && url.pathname === "/api/verify-code") {
@@ -237,6 +369,34 @@ export default {
 
     if (request.method === "POST" && url.pathname === "/api/admin/codes") {
       return handleCreateCode(request, env, cors);
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/admin/codes") {
+      return handleAdminListCodes(env, cors);
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/admin/codes/set-max") {
+      return handleAdminSetCodeMax(request, env, cors);
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/admin/codes/set-active") {
+      return handleAdminSetCodeActive(request, env, cors);
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/admin/codes/delete") {
+      return handleAdminDeleteCode(request, env, cors);
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/admin/users") {
+      return handleAdminListUsers(url, env, cors);
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/admin/users/delete") {
+      return handleAdminDeleteUser(request, env, cors);
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/admin/claims") {
+      return handleAdminListClaims(url, env, cors);
     }
 
     return json({ ok: false, error: "not_found" }, 404, cors);

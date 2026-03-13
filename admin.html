@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEW3 Admin Panel</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="panel">
+    <h1>MEW3 ADMIN</h1>
+    <p>Manage codes, users, and recent claims.</p>
+  </header>
+
+  <section class="panel auth">
+    <label for="adminToken">Admin Token</label>
+    <div class="row">
+      <input id="adminToken" type="password" placeholder="Bearer token">
+      <button id="saveTokenBtn">Save Token</button>
+      <button id="refreshAllBtn">Refresh All</button>
+    </div>
+    <p id="authStatus" class="status"></p>
+  </section>
+
+  <section class="panel">
+    <h2>Create or Update Code</h2>
+    <div class="row form-grid">
+      <input id="newCode" placeholder="code">
+      <input id="newLabel" placeholder="label (optional)">
+      <input id="newMaxClaims" type="number" min="1" value="100" placeholder="max claims">
+      <button id="createCodeBtn">Save Code</button>
+    </div>
+    <p id="codeCreateStatus" class="status"></p>
+  </section>
+
+  <section class="panel">
+    <h2>Access Codes</h2>
+    <div id="codesTableWrap" class="table-wrap"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Users</h2>
+    <div id="usersTableWrap" class="table-wrap"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Recent Claims</h2>
+    <div id="claimsTableWrap" class="table-wrap"></div>
+  </section>
+</div>
+
+<script src="site-config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
