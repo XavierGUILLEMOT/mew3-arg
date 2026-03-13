@@ -282,6 +282,8 @@ async function handleAdminDeleteCode(request, env, cors) {
     return json({ ok: false, error: "invalid_payload" }, 400, cors);
   }
 
+  // Defensive delete flow: works even if older DB schema has no ON DELETE CASCADE.
+  await env.DB.prepare(`DELETE FROM claims WHERE code_id = ?`).bind(id).run();
   const result = await env.DB.prepare(`DELETE FROM access_codes WHERE id = ?`).bind(id).run();
   if (!result.meta || result.meta.changes < 1) {
     return json({ ok: false, error: "not_found" }, 404, cors);
@@ -314,6 +316,8 @@ async function handleAdminDeleteUser(request, env, cors) {
     return json({ ok: false, error: "invalid_payload" }, 400, cors);
   }
 
+  // Defensive delete flow: works even if older DB schema has no ON DELETE CASCADE.
+  await env.DB.prepare(`DELETE FROM claims WHERE user_id = ?`).bind(id).run();
   const result = await env.DB.prepare(`DELETE FROM users WHERE id = ?`).bind(id).run();
   if (!result.meta || result.meta.changes < 1) {
     return json({ ok: false, error: "not_found" }, 404, cors);
@@ -342,63 +346,74 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const cors = corsHeaders(request.headers.get("origin") || "", env);
+    try {
+      if (request.method === "OPTIONS") {
+        return new Response(null, { status: 204, headers: cors });
+      }
 
-    if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: cors });
+      if (url.pathname === "/api/health") {
+        return json({ ok: true }, 200, cors);
+      }
+
+      if (url.pathname.startsWith("/api/admin/") && !isAdminAuthorized(request, env)) {
+        return unauthorized(cors);
+      }
+
+      if (request.method === "POST" && url.pathname === "/api/verify-code") {
+        return handleVerify(request, env, cors);
+      }
+
+      if (request.method === "POST" && url.pathname === "/api/register") {
+        return handleRegister(request, env, cors);
+      }
+
+      if (request.method === "GET" && url.pathname === "/api/stats") {
+        return handleStats(env, cors);
+      }
+
+      if (request.method === "POST" && url.pathname === "/api/admin/codes") {
+        return handleCreateCode(request, env, cors);
+      }
+
+      if (request.method === "GET" && url.pathname === "/api/admin/codes") {
+        return handleAdminListCodes(env, cors);
+      }
+
+      if (request.method === "POST" && url.pathname === "/api/admin/codes/set-max") {
+        return handleAdminSetCodeMax(request, env, cors);
+      }
+
+      if (request.method === "POST" && url.pathname === "/api/admin/codes/set-active") {
+        return handleAdminSetCodeActive(request, env, cors);
+      }
+
+      if (request.method === "POST" && url.pathname === "/api/admin/codes/delete") {
+        return handleAdminDeleteCode(request, env, cors);
+      }
+
+      if (request.method === "GET" && url.pathname === "/api/admin/users") {
+        return handleAdminListUsers(url, env, cors);
+      }
+
+      if (request.method === "POST" && url.pathname === "/api/admin/users/delete") {
+        return handleAdminDeleteUser(request, env, cors);
+      }
+
+      if (request.method === "GET" && url.pathname === "/api/admin/claims") {
+        return handleAdminListClaims(url, env, cors);
+      }
+
+      return json({ ok: false, error: "not_found" }, 404, cors);
+    } catch (err) {
+      return json(
+        {
+          ok: false,
+          error: "server_error",
+          message: err && err.message ? String(err.message) : "unexpected_error",
+        },
+        500,
+        cors
+      );
     }
-
-    if (url.pathname === "/api/health") {
-      return json({ ok: true }, 200, cors);
-    }
-
-    if (url.pathname.startsWith("/api/admin/") && !isAdminAuthorized(request, env)) {
-      return unauthorized(cors);
-    }
-
-    if (request.method === "POST" && url.pathname === "/api/verify-code") {
-      return handleVerify(request, env, cors);
-    }
-
-    if (request.method === "POST" && url.pathname === "/api/register") {
-      return handleRegister(request, env, cors);
-    }
-
-    if (request.method === "GET" && url.pathname === "/api/stats") {
-      return handleStats(env, cors);
-    }
-
-    if (request.method === "POST" && url.pathname === "/api/admin/codes") {
-      return handleCreateCode(request, env, cors);
-    }
-
-    if (request.method === "GET" && url.pathname === "/api/admin/codes") {
-      return handleAdminListCodes(env, cors);
-    }
-
-    if (request.method === "POST" && url.pathname === "/api/admin/codes/set-max") {
-      return handleAdminSetCodeMax(request, env, cors);
-    }
-
-    if (request.method === "POST" && url.pathname === "/api/admin/codes/set-active") {
-      return handleAdminSetCodeActive(request, env, cors);
-    }
-
-    if (request.method === "POST" && url.pathname === "/api/admin/codes/delete") {
-      return handleAdminDeleteCode(request, env, cors);
-    }
-
-    if (request.method === "GET" && url.pathname === "/api/admin/users") {
-      return handleAdminListUsers(url, env, cors);
-    }
-
-    if (request.method === "POST" && url.pathname === "/api/admin/users/delete") {
-      return handleAdminDeleteUser(request, env, cors);
-    }
-
-    if (request.method === "GET" && url.pathname === "/api/admin/claims") {
-      return handleAdminListClaims(url, env, cors);
-    }
-
-    return json({ ok: false, error: "not_found" }, 404, cors);
   },
 };
