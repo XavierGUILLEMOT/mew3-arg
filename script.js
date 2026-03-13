@@ -9,6 +9,8 @@ const playlist = [
 ];
 
 let currentTrack = null;
+let currentTrackIndex = -1;
+let playbackUnlocked = false;
 let pendingCode = null;
 const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
   ? window.APP_CONFIG.API_BASE_URL.replace(/\/$/, "")
@@ -63,18 +65,68 @@ function calculateAnimationDuration(bpm){
   return (60 / bpm) * 2; // Duration in seconds
 }
 
-function loadRandomTrack(){
-  const randomIndex = Math.floor(Math.random() * playlist.length);
-  currentTrack = playlist[randomIndex];
-  
+function pickRandomTrackIndex(){
+  if(playlist.length <= 1){
+    return 0;
+  }
+
+  let randomIndex = currentTrackIndex;
+  while(randomIndex === currentTrackIndex){
+    randomIndex = Math.floor(Math.random() * playlist.length);
+  }
+  return randomIndex;
+}
+
+function updateAudioButtonLabel(){
   const audio = document.getElementById("bgAudio");
-  const source = audio.querySelector("source");
-  source.src = currentTrack.file;
+  const btn = document.getElementById("muteBtn");
+  if(!audio || !btn){
+    return;
+  }
+
+  if(audio.muted){
+    btn.innerText = "AUDIO OFF";
+    return;
+  }
+
+  if(!playbackUnlocked && audio.paused){
+    btn.innerText = "START AUDIO";
+    return;
+  }
+
+  btn.innerText = "AUDIO ON";
+}
+
+async function tryPlayAudio(){
+  const audio = document.getElementById("bgAudio");
+  try{
+    await audio.play();
+    playbackUnlocked = true;
+  }catch(_e){
+    // Browser blocked autoplay: it will start on first user interaction.
+  }
+  updateAudioButtonLabel();
+}
+
+function setTrack(index){
+  currentTrackIndex = index;
+  currentTrack = playlist[index];
+
+  const audio = document.getElementById("bgAudio");
+  audio.src = currentTrack.file;
   audio.load();
-  audio.play().catch(e => console.log("Autoplay failed, might need user interaction"));
-  
+
   updateNowPlaying();
   updatePulseAnimation();
+}
+
+function loadRandomTrack(){
+  setTrack(pickRandomTrackIndex());
+  tryPlayAudio();
+}
+
+function nextTrack(){
+  loadRandomTrack();
 }
 
 function updateNowPlaying(){
@@ -102,23 +154,31 @@ document.addEventListener("DOMContentLoaded", function(){
 
 function toggleMute(){
 const audio = document.getElementById("bgAudio")
-const btn = document.getElementById("muteBtn")
 
 if(audio.muted){
 audio.muted = false
-btn.innerText = "AUDIO ON"
+tryPlayAudio()
 }else{
 audio.muted = true
-btn.innerText = "AUDIO OFF"
+updateAudioButtonLabel()
 }
 }
 
 window.onload = function(){
 const audio = document.getElementById("bgAudio")
-const btn = document.getElementById("muteBtn")
 
 audio.volume = 0.3
-btn.innerText = audio.muted ? "AUDIO OFF" : "AUDIO ON"
+
+const unlockOnFirstInteraction = () => {
+  if(!audio.muted){
+    tryPlayAudio();
+  }
+};
+
+document.addEventListener("pointerdown", unlockOnFirstInteraction, { once: true });
+document.addEventListener("keydown", unlockOnFirstInteraction, { once: true });
+
+updateAudioButtonLabel()
 loadRandomTrack()
 refreshStats()
 }

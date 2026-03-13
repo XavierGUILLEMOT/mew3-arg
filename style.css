@@ -326,7 +326,8 @@ margin-bottom:20px;
 
 /* Mute Button */
 
-.mute-btn{
+.mute-btn,
+.next-btn{
 min-width:118px;
 height:44px;
 background:rgba(0,0,0,0.85);
@@ -346,7 +347,8 @@ align-items:center;
 padding:0 12px;
 }
 
-.mute-btn:hover{
+.mute-btn:hover,
+.next-btn:hover{
 box-shadow:0 0 14px rgba(0,255,156,0.6);
 background:#00ff9c;
 color:black;
