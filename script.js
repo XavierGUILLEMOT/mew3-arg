@@ -26,8 +26,13 @@ const API_FALLBACK_URL = (window.APP_CONFIG && window.APP_CONFIG.API_FALLBACK_UR
   : "https://mew3-api.mail-xavierguillemot.workers.dev";
 
 function isInAppBrowser(){
-  const ua = (navigator.userAgent || "").toLowerCase();
-  return /instagram|fban|fbav|fb_iab|tiktok|snapchat|line\//.test(ua);
+  const ua = navigator.userAgent || "";
+  const patterns = [
+    /Instagram/i,
+    /FBAN|FBAV|FB_IAB/i,
+    /TikTok|musical_ly/i,
+  ];
+  return patterns.some((re) => re.test(ua));
 }
 
 function showInAppNotice(){
