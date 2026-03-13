@@ -418,7 +418,8 @@ filter:drop-shadow(0 0 16px rgba(0,255,156,0.12));
 .grid-3d{
 top:-12vh;
 height:124vh;
-transform:perspective(780px) rotateX(58deg) translateY(170px) scaleY(1.85);
+transform-origin:center top;
+transform:perspective(780px) rotateX(58deg) translateY(60px) scaleY(1.85);
 }
 
 .audio-controls{
@@ -448,7 +449,8 @@ font-size:16px;
 .grid-3d{
 top:-16vh;
 height:132vh;
-transform:perspective(700px) rotateX(54deg) translateY(130px) scaleY(1.55);
+transform-origin:center top;
+transform:perspective(700px) rotateX(54deg) translateY(32px) scaleY(1.55);
 }
 
 .container{
