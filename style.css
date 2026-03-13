@@ -211,7 +211,7 @@ clip-path:polygon(0 55%,100% 55%,100% 100%,0 100%);
 
 .boot{
 font-size:12px;
-margin-bottom:40px;
+margin-bottom:20px;
 opacity:0.7;
 }
 
@@ -246,11 +246,21 @@ button:hover{
 box-shadow:0 0 10px #00ff9c;
 }
 
+.mew3-link{
+display:inline-block;
+margin-bottom:12px;
+}
+
+.mew3-link:hover .mew3-image{
+transform:scale(1.02);
+}
+
 .mew3-image{
-max-width:200px;
+max-width:280px;
 height:auto;
-margin-bottom:20px;
+margin-bottom:10px;
 filter:drop-shadow(0 0 10px #00ff9c);
+transition:transform 0.2s ease;
 }
 
 .counter{
@@ -400,7 +410,7 @@ margin-bottom:16px;
 }
 
 .boot{
-margin-bottom:24px;
+margin-bottom:14px;
 font-size:clamp(12px,2.8vw,14px);
 line-height:1.5;
 }
@@ -428,7 +438,7 @@ margin-top:3vh;
 }
 
 .mew3-image{
-max-width:170px;
+max-width:220px;
 margin-bottom:14px;
 }
 
