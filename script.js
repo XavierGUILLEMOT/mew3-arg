@@ -27,16 +27,7 @@ const API_FALLBACK_URL = (window.APP_CONFIG && window.APP_CONFIG.API_FALLBACK_UR
 
 function isInAppBrowser(){
   const ua = navigator.userAgent || "";
-  const ref = document.referrer || "";
-
-  const explicitInAppUA = /Instagram|FBAN|FBAV|FB_IAB|Messenger|TikTok|musical_ly/i.test(ua);
-  if(explicitInAppUA){
-    return true;
-  }
-
-  const inAppReferrer = /instagram\.com|l\.instagram\.com|facebook\.com|lm\.facebook\.com|tiktok\.com/i.test(ref);
-  const standaloneBrowserUA = /CriOS|Chrome\/|EdgA|Firefox|FxiOS|Version\/.*Safari|OPR\/|SamsungBrowser/i.test(ua);
-  return inAppReferrer && !standaloneBrowserUA;
+  return /Instagram|FBAN|FBAV|FB_IAB|Messenger|TikTok|musical_ly/i.test(ua);
 }
 
 function showInAppNotice(){

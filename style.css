@@ -341,14 +341,14 @@ text-align:center;
 }
 
 .in-app-mode .in-app-notice{
-margin-top:48px;
+margin-top:68px;
 }
 
 .in-app-corner-hint{
-position:fixed;
+position:fixed !important;
 top:calc(env(safe-area-inset-top, 0px) + 8px);
 right:10px;
-z-index:50;
+z-index:120;
 display:flex;
 align-items:center;
 gap:8px;
@@ -380,12 +380,13 @@ animation:hintPulse 1.25s ease-in-out infinite;
 .in-app-corner-hint{
 top:calc(env(safe-area-inset-top, 0px) + 6px);
 right:6px;
+z-index:120;
 padding:4px 6px;
 gap:6px;
 }
 
 .in-app-mode .in-app-notice{
-margin-top:42px;
+margin-top:64px;
 }
 
 .hint-label{
