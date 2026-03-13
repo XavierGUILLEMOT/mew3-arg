@@ -13,10 +13,14 @@
 
 <body>
 
-<!-- Audio -->
-<audio id="bgAudio" autoplay loop>
-<source src="EDGE_LIVE_XTRACT_49.mp3" type="audio/mpeg">
-</audio>
+<!-- SoundCloud Player (hidden, controlled via JS) -->
+<iframe
+id="scPlayer"
+title="SoundCloud Player"
+allow="autoplay"
+style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px;"
+src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/czer46/edge-live-xtract&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false">
+</iframe>
 
 <!-- 3D Grid Background -->
 <div class="grid-3d"></div>
@@ -121,6 +125,7 @@ Only your username will be public. Your first name, last name and email stay con
 </div>
 
 <script src="site-config.js"></script>
+<script src="https://w.soundcloud.com/player/api.js"></script>
 <script src="script.js"></script>
 
 </body>

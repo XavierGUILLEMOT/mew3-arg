@@ -1,16 +1,20 @@
-// Playlist with BPM info
+// SoundCloud playlist (easy to extend)
 const playlist = [
-  { file: "EDGE_LIVE_XTRACT_49.mp3", title: "EDGE [LIVE XTRACT] #49 | Adelphe", bpm: 165, url: "https://soundcloud.com/czer46/edge-live-xtract" },
+  { title: "EDGE [LIVE XTRACT] #49 | Adelphe", url: "https://soundcloud.com/czer46/edge-live-xtract" },
   // Add more tracks here (max 5):
-  // { file: "track2.mp3", title: "Track Title", bpm: 140, url: "https://soundcloud.com/..." },
-  // { file: "track3.mp3", title: "Track Title", bpm: 120, url: "https://soundcloud.com/..." },
-  // { file: "track4.mp3", title: "Track Title", bpm: 128, url: "https://soundcloud.com/..." },
-  // { file: "track5.mp3", title: "Track Title", bpm: 100, url: "https://soundcloud.com/..." },
+  // { title: "Track Title", url: "https://soundcloud.com/..." },
+  // { title: "Track Title", url: "https://soundcloud.com/..." },
+  // { title: "Track Title", url: "https://soundcloud.com/..." },
+  // { title: "Track Title", url: "https://soundcloud.com/..." },
 ];
 
 let currentTrack = null;
 let currentTrackIndex = -1;
-let playbackUnlocked = false;
+let hasUserStartedAudio = false;
+let scWidget = null;
+let scReady = false;
+let isMuted = false;
+const SOUND_VOLUME = 35;
 let pendingCode = null;
 const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
   ? window.APP_CONFIG.API_BASE_URL.replace(/\/$/, "")
@@ -61,10 +65,6 @@ async function refreshStats() {
   }
 }
 
-function calculateAnimationDuration(bpm){
-  return (60 / bpm) * 2; // Duration in seconds
-}
-
 function pickRandomTrackIndex(){
   if(playlist.length <= 1){
     return 0;
@@ -77,107 +77,160 @@ function pickRandomTrackIndex(){
   return randomIndex;
 }
 
+function updateNowPlaying(){
+  const link = document.querySelector(".now-playing");
+  if(!link || !currentTrack){
+    return;
+  }
+
+  link.href = currentTrack.url;
+  link.innerText = `Playing - ${currentTrack.title}`;
+}
+
 function updateAudioButtonLabel(){
-  const audio = document.getElementById("bgAudio");
   const btn = document.getElementById("muteBtn");
-  if(!audio || !btn){
+  if(!btn){
     return;
   }
 
-  if(audio.muted){
-    btn.innerText = "AUDIO OFF";
-    return;
-  }
-
-  if(!playbackUnlocked && audio.paused){
+  if(!hasUserStartedAudio){
     btn.innerText = "START PLAYING";
     return;
   }
 
-  btn.innerText = "AUDIO ON";
+  if(isMuted){
+    btn.innerText = "AUDIO OFF";
+  }else{
+    btn.innerText = "AUDIO ON";
+  }
 }
 
-async function tryPlayAudio(){
-  const audio = document.getElementById("bgAudio");
+function ensureWidgetReady(){
+  if(scReady && scWidget){
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve, reject) => {
+    const iframe = document.getElementById("scPlayer");
+    if(!iframe || !window.SC || !window.SC.Widget){
+      reject(new Error("soundcloud_unavailable"));
+      return;
+    }
+
+    scWidget = window.SC.Widget(iframe);
+
+    scWidget.bind(window.SC.Widget.Events.READY, () => {
+      scReady = true;
+      resolve();
+    });
+
+    scWidget.bind(window.SC.Widget.Events.ERROR, () => {
+      reject(new Error("soundcloud_widget_error"));
+    });
+  });
+}
+
+function applyWidgetVolume(){
+  if(!scWidget){
+    return;
+  }
+  scWidget.setVolume(isMuted ? 0 : SOUND_VOLUME);
+}
+
+function loadTrack(index, autoplay){
+  if(!scWidget){
+    return;
+  }
+
+  currentTrackIndex = index;
+  currentTrack = playlist[index];
+  updateNowPlaying();
+
+  scWidget.load(currentTrack.url, {
+    auto_play: Boolean(autoplay),
+    buying: false,
+    sharing: false,
+    download: false,
+    show_artwork: false,
+    show_comments: false,
+    show_playcount: false,
+    show_user: false,
+    show_reposts: false,
+    hide_related: true,
+    visual: false,
+  });
+
+  applyWidgetVolume();
+  updateAudioButtonLabel();
+}
+
+async function startPlaying(){
+  hasUserStartedAudio = true;
+  isMuted = false;
+
+  await ensureWidgetReady();
+  if(currentTrackIndex < 0){
+    currentTrackIndex = pickRandomTrackIndex();
+  }
+
+  loadTrack(currentTrackIndex, true);
+
   try{
-    await audio.play();
-    playbackUnlocked = true;
+    scWidget.play();
   }catch(_e){
-    // Browser blocked autoplay: it will start on first user interaction.
+    // Keep silent; play can still be blocked in some browsers until a direct interaction.
   }
   updateAudioButtonLabel();
 }
 
-function setTrack(index){
-  currentTrackIndex = index;
-  currentTrack = playlist[index];
-
-  const audio = document.getElementById("bgAudio");
-  audio.src = currentTrack.file;
-  audio.load();
-
-  updateNowPlaying();
-  updatePulseAnimation();
-}
-
 function loadRandomTrack(){
-  setTrack(pickRandomTrackIndex());
-  tryPlayAudio();
+  const nextIndex = pickRandomTrackIndex();
+  if(currentTrackIndex < 0){
+    currentTrackIndex = nextIndex;
+    currentTrack = playlist[currentTrackIndex];
+    updateNowPlaying();
+    updateAudioButtonLabel();
+    return;
+  }
+
+  loadTrack(nextIndex, hasUserStartedAudio);
 }
 
 function nextTrack(){
   loadRandomTrack();
 }
 
-function updateNowPlaying(){
-  const link = document.querySelector(".now-playing");
-  link.href = currentTrack.url;
-  link.innerText = `Playing - ${currentTrack.title}`;
-}
-
-function updatePulseAnimation(){
-  const duration = calculateAnimationDuration(currentTrack.bpm);
-  const style = document.documentElement.style;
-  style.setProperty("--pulse-duration", duration + "s");
-  
-  const beforeElement = document.querySelector("body::before");
-  if(beforeElement){
-    beforeElement.style.animationDuration = duration + "s";
-  }
-}
-
-// Apply CSS variable for animation
-document.addEventListener("DOMContentLoaded", function(){
-  const root = document.documentElement;
-  root.style.setProperty("--pulse-duration", "0.36s");
-});
-
 function toggleMute(){
-const audio = document.getElementById("bgAudio")
-
-if(!playbackUnlocked){
-audio.muted = false
-tryPlayAudio()
-return
+if(!hasUserStartedAudio){
+startPlaying();
+return;
 }
 
-if(audio.muted){
-audio.muted = false
-tryPlayAudio()
-}else{
-audio.muted = true
-updateAudioButtonLabel()
+isMuted = !isMuted;
+applyWidgetVolume();
+if(!isMuted && scWidget){
+  scWidget.play();
 }
+updateAudioButtonLabel();
 }
 
 window.onload = function(){
-const audio = document.getElementById("bgAudio")
+updateAudioButtonLabel();
+loadRandomTrack();
+refreshStats();
 
-audio.volume = 0.3
-
-updateAudioButtonLabel()
-loadRandomTrack()
-refreshStats()
+ensureWidgetReady()
+  .then(() => {
+    if(currentTrackIndex >= 0){
+      loadTrack(currentTrackIndex, false);
+    }
+  })
+  .catch(() => {
+    const btn = document.getElementById("muteBtn");
+    if(btn){
+      btn.innerText = "AUDIO ERROR";
+    }
+  });
 }
 
 async function verifyCode(){
