@@ -328,6 +328,18 @@ gap:15px;
 margin-bottom:20px;
 }
 
+.in-app-notice{
+margin:0 auto 14px;
+max-width:540px;
+padding:10px 12px;
+border:1px solid rgba(0,255,156,0.7);
+background:rgba(0,255,156,0.08);
+font-size:12px;
+line-height:1.45;
+color:#a4ffd9;
+text-align:center;
+}
+
 /* Mute Button */
 
 .mute-btn,

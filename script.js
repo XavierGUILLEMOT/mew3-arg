@@ -21,22 +21,57 @@ let pendingCode = null;
 const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
   ? window.APP_CONFIG.API_BASE_URL.replace(/\/$/, "")
   : "https://api.mew3.online";
+const API_FALLBACK_URL = (window.APP_CONFIG && window.APP_CONFIG.API_FALLBACK_URL)
+  ? window.APP_CONFIG.API_FALLBACK_URL.replace(/\/$/, "")
+  : "https://mew3-api.mail-xavierguillemot.workers.dev";
+
+function isInAppBrowser(){
+  const ua = (navigator.userAgent || "").toLowerCase();
+  return /instagram|fban|fbav|fb_iab|tiktok|snapchat|line\//.test(ua);
+}
+
+function showInAppNotice(){
+  const notice = document.getElementById("inAppNotice");
+  if(notice){
+    notice.hidden = !isInAppBrowser();
+  }
+}
 
 async function apiFetch(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const requestOptions = {
     ...options,
     headers: {
       "content-type": "application/json",
       ...(options.headers || {}),
     },
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const err = new Error(data.error || "api_error");
-    err.code = data.error || "api_error";
-    throw err;
+  };
+
+  async function doFetch(baseUrl){
+    const response = await fetch(`${baseUrl}${path}`, requestOptions);
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const err = new Error(data.error || "api_error");
+      err.code = data.error || "api_error";
+      throw err;
+    }
+    return data;
   }
-  return data;
+
+  try{
+    return await doFetch(API_BASE_URL);
+  }catch(e){
+    const isNetworkError = e && (e.name === "TypeError" || e.message === "Failed to fetch");
+    if(isNetworkError && API_FALLBACK_URL && API_FALLBACK_URL !== API_BASE_URL){
+      try{
+        return await doFetch(API_FALLBACK_URL);
+      }catch(_fallbackError){
+        const err = new Error("network_error");
+        err.code = "network_error";
+        throw err;
+      }
+    }
+    throw e;
+  }
 }
 
 function updateSubjectsList(usernames) {
@@ -278,6 +313,7 @@ updateAudioButtonLabel();
 }
 
 window.onload = function(){
+showInAppNotice();
 updateAudioButtonLabel();
 loadRandomTrack();
 refreshStats();
@@ -320,6 +356,8 @@ document.getElementById("popup").style.display="flex"
 }catch(e){
 if(e.code === "exhausted"){
 message.innerText = "CODE IS ALREADY USED, KEEP WATCHING"
+}else if(e.code === "network_error"){
+message.innerText = "NETWORK BLOCKED IN IN-APP BROWSER. OPEN IN EXTERNAL BROWSER"
 }else{
 message.innerText = "ACCESS DENIED"
 }
@@ -371,6 +409,8 @@ message.innerText = "ALREADY CLAIMED WITH THIS EMAIL"
 message.innerText = "INVALID EMAIL"
 }else if(e.code === "exhausted"){
 message.innerText = "CODE IS ALREADY USED, KEEP WATCHING"
+}else if(e.code === "network_error"){
+message.innerText = "NETWORK BLOCKED IN IN-APP BROWSER. OPEN IN EXTERNAL BROWSER"
 }else{
 message.innerText = "REGISTRATION FAILED"
 }
