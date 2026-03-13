@@ -327,24 +327,27 @@ margin-bottom:20px;
 /* Mute Button */
 
 .mute-btn{
-width:50px;
-height:50px;
-background:black;
+min-width:118px;
+height:44px;
+background:rgba(0,0,0,0.85);
 border:2px solid #00ff9c;
 color:#00ff9c;
-font-size:24px;
+font-size:12px;
+font-family:monospace;
+letter-spacing:1px;
+font-weight:bold;
 cursor:pointer;
 z-index:100;
-border-radius:50%;
+border-radius:0;
 transition:all 0.2s;
 display:flex;
 justify-content:center;
 align-items:center;
-padding:0;
+padding:0 12px;
 }
 
 .mute-btn:hover{
-box-shadow:0 0 15px #00ff9c;
+box-shadow:0 0 14px rgba(0,255,156,0.6);
 background:#00ff9c;
 color:black;
 }
@@ -512,25 +515,6 @@ cursor:pointer;
 
 .popup-content button:hover{
 box-shadow:0 0 12px #00ff9c;
-}
-
-.admin-link{
-position:fixed;
-right:12px;
-bottom:10px;
-z-index:20;
-color:rgba(0,255,156,0.7);
-text-decoration:none;
-font-size:11px;
-letter-spacing:1px;
-border:1px solid rgba(0,255,156,0.35);
-padding:4px 6px;
-background:rgba(0,0,0,0.45);
-}
-
-.admin-link:hover{
-color:#00ff9c;
-border-color:#00ff9c;
 }
 
 /* animations */

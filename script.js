@@ -106,15 +106,19 @@ const btn = document.getElementById("muteBtn")
 
 if(audio.muted){
 audio.muted = false
-btn.innerText = "🔊"
+btn.innerText = "AUDIO ON"
 }else{
 audio.muted = true
-btn.innerText = "🔇"
+btn.innerText = "AUDIO OFF"
 }
 }
 
 window.onload = function(){
-document.getElementById("bgAudio").volume = 0.3
+const audio = document.getElementById("bgAudio")
+const btn = document.getElementById("muteBtn")
+
+audio.volume = 0.3
+btn.innerText = audio.muted ? "AUDIO OFF" : "AUDIO ON"
 loadRandomTrack()
 refreshStats()
 }
