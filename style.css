@@ -340,9 +340,13 @@ color:#a4ffd9;
 text-align:center;
 }
 
+.in-app-mode .in-app-notice{
+margin-top:48px;
+}
+
 .in-app-corner-hint{
 position:fixed;
-top:10px;
+top:calc(env(safe-area-inset-top, 0px) + 8px);
 right:10px;
 z-index:50;
 display:flex;
@@ -374,10 +378,14 @@ animation:hintPulse 1.25s ease-in-out infinite;
 
 @media (max-width:600px){
 .in-app-corner-hint{
-top:6px;
+top:calc(env(safe-area-inset-top, 0px) + 6px);
 right:6px;
 padding:4px 6px;
 gap:6px;
+}
+
+.in-app-mode .in-app-notice{
+margin-top:42px;
 }
 
 .hint-label{
