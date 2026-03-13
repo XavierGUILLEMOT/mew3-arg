@@ -360,47 +360,47 @@ export default {
       }
 
       if (request.method === "POST" && url.pathname === "/api/verify-code") {
-        return handleVerify(request, env, cors);
+        return await handleVerify(request, env, cors);
       }
 
       if (request.method === "POST" && url.pathname === "/api/register") {
-        return handleRegister(request, env, cors);
+        return await handleRegister(request, env, cors);
       }
 
       if (request.method === "GET" && url.pathname === "/api/stats") {
-        return handleStats(env, cors);
+        return await handleStats(env, cors);
       }
 
       if (request.method === "POST" && url.pathname === "/api/admin/codes") {
-        return handleCreateCode(request, env, cors);
+        return await handleCreateCode(request, env, cors);
       }
 
       if (request.method === "GET" && url.pathname === "/api/admin/codes") {
-        return handleAdminListCodes(env, cors);
+        return await handleAdminListCodes(env, cors);
       }
 
       if (request.method === "POST" && url.pathname === "/api/admin/codes/set-max") {
-        return handleAdminSetCodeMax(request, env, cors);
+        return await handleAdminSetCodeMax(request, env, cors);
       }
 
       if (request.method === "POST" && url.pathname === "/api/admin/codes/set-active") {
-        return handleAdminSetCodeActive(request, env, cors);
+        return await handleAdminSetCodeActive(request, env, cors);
       }
 
       if (request.method === "POST" && url.pathname === "/api/admin/codes/delete") {
-        return handleAdminDeleteCode(request, env, cors);
+        return await handleAdminDeleteCode(request, env, cors);
       }
 
       if (request.method === "GET" && url.pathname === "/api/admin/users") {
-        return handleAdminListUsers(url, env, cors);
+        return await handleAdminListUsers(url, env, cors);
       }
 
       if (request.method === "POST" && url.pathname === "/api/admin/users/delete") {
-        return handleAdminDeleteUser(request, env, cors);
+        return await handleAdminDeleteUser(request, env, cors);
       }
 
       if (request.method === "GET" && url.pathname === "/api/admin/claims") {
-        return handleAdminListClaims(url, env, cors);
+        return await handleAdminListClaims(url, env, cors);
       }
 
       return json({ ok: false, error: "not_found" }, 404, cors);
