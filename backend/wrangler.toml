@@ -8,5 +8,5 @@ ALLOWED_ORIGINS = "https://mew3.online,https://www.mew3.online,https://xaviergui
 [[d1_databases]]
 binding = "DB"
 database_name = "mew3-db"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "8f1e18a9-e328-40b9-8925-bf708c9c12cc"
 migrations_dir = "migrations"

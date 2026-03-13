@@ -30,6 +30,9 @@ Copie le `database_id` renvoye et remplace `REPLACE_WITH_YOUR_D1_DATABASE_ID` da
 npx wrangler d1 migrations apply mew3-db --remote
 ```
 
+Si tu vois `FOREIGN KEY constraint failed` en supprimant un user dans D1 Studio,
+applique bien toutes les migrations (dont `0002_claims_on_delete_cascade.sql`) pour activer la suppression en cascade sur `claims`.
+
 ## 5) Configurer les secrets
 
 ```bash

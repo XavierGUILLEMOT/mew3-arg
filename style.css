@@ -3,13 +3,16 @@ background:#000;
 color:#00ff9c;
 font-family:monospace;
 margin:0;
-height:100vh;
+min-height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-overflow:hidden;
+overflow-x:hidden;
+overflow-y:auto;
 position:relative;
 perspective:800px;
+padding:24px 12px;
+box-sizing:border-box;
 }
 
 /* 3D Grid Background */
@@ -140,7 +143,6 @@ opacity:0.7;
 opacity:0;
 }
 }
-}
 
 /* CRT scanlines */
 
@@ -165,6 +167,7 @@ z-index:10;
 .container{
 text-align:center;
 width:420px;
+max-width:100%;
 z-index:2;
 transform:rotateX(5deg) rotateY(2deg);
 filter:drop-shadow(0 0 20px rgba(0,255,156,0.1));
@@ -336,7 +339,8 @@ color:#00ff9c;
 text-decoration:none;
 font-size:12px;
 font-family:monospace;
-white-space:nowrap;
+white-space:normal;
+overflow-wrap:anywhere;
 transition:all 0.2s;
 border-bottom:1px solid transparent;
 }
@@ -368,6 +372,105 @@ margin-right:auto;
 background:#00ff9c;
 color:black;
 box-shadow:0 0 15px #00ff9c;
+}
+
+@media (max-width:900px){
+body{
+align-items:flex-start;
+padding:16px 14px 30px;
+perspective:none;
+}
+
+.container{
+width:min(94vw,520px);
+max-width:520px;
+margin-top:5vh;
+transform:none;
+filter:drop-shadow(0 0 16px rgba(0,255,156,0.12));
+}
+
+.grid-3d{
+transform:perspective(780px) rotateX(58deg) translateY(170px) scaleY(1.85);
+}
+
+.audio-controls{
+flex-direction:column;
+gap:10px;
+margin-bottom:16px;
+}
+
+.boot{
+margin-bottom:24px;
+font-size:clamp(12px,2.8vw,14px);
+line-height:1.5;
+}
+
+.counter,
+.leaderboard{
+margin-top:20px;
+}
+
+input,
+button{
+font-size:16px;
+}
+}
+
+@media (max-width:600px){
+.grid-3d{
+transform:perspective(700px) rotateX(54deg) translateY(130px) scaleY(1.55);
+}
+
+.container{
+width:94vw;
+max-width:420px;
+margin-top:3vh;
+}
+
+.mew3-image{
+max-width:170px;
+margin-bottom:14px;
+}
+
+.now-playing{
+font-size:12px;
+max-width:94vw;
+}
+
+.input-group{
+flex-direction:column;
+gap:10px;
+}
+
+input,
+button{
+width:100%;
+box-sizing:border-box;
+}
+
+.billeterie-link{
+width:100%;
+max-width:360px;
+font-size:12px;
+padding:10px 12px;
+text-align:center;
+box-sizing:border-box;
+}
+
+.counter{
+font-size:14px;
+}
+
+.leaderboard{
+font-size:13px;
+}
+
+.popup-content{
+width:100%;
+max-width:340px;
+padding:24px 16px;
+box-sizing:border-box;
+}
 }
 
 .popup-content input{
