@@ -13,6 +13,7 @@ let currentTrackIndex = -1;
 let hasUserStartedAudio = false;
 let scWidget = null;
 let scReady = false;
+let playbackConfirmed = false;
 let isMuted = false;
 const SOUND_VOLUME = 35;
 let pendingCode = null;
@@ -124,6 +125,14 @@ function ensureWidgetReady(){
       resolve();
     });
 
+    scWidget.bind(window.SC.Widget.Events.PLAY, () => {
+      playbackConfirmed = true;
+    });
+
+    scWidget.bind(window.SC.Widget.Events.PAUSE, () => {
+      playbackConfirmed = false;
+    });
+
     scWidget.bind(window.SC.Widget.Events.ERROR, () => {
       reject(new Error("soundcloud_widget_error"));
     });
@@ -167,6 +176,7 @@ function loadTrack(index, autoplay){
 async function startPlaying(){
   hasUserStartedAudio = true;
   isMuted = false;
+  playbackConfirmed = false;
 
   await ensureWidgetReady();
   if(currentTrackIndex < 0){
@@ -177,6 +187,13 @@ async function startPlaying(){
 
   try{
     scWidget.play();
+    // On some mobile browsers, first play attempt can be delayed or dropped.
+    // A short retry keeps UX as a single tap.
+    setTimeout(() => {
+      if(!isMuted && !playbackConfirmed && scWidget){
+        scWidget.play();
+      }
+    }, 250);
   }catch(_e){
     // Keep silent; play can still be blocked in some browsers until a direct interaction.
   }
@@ -216,6 +233,13 @@ function toggleMute(){
 if(!hasUserStartedAudio){
 startPlaying();
 return;
+}
+
+if(!playbackConfirmed && !isMuted){
+  if(scWidget){
+    scWidget.play();
+  }
+  return;
 }
 
 isMuted = !isMuted;
