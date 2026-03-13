@@ -122,8 +122,8 @@ function renderUsers(users) {
     <tr>
       <td>${u.id}</td>
       <td>${escapeHtml(u.username)}</td>
-      <td>${escapeHtml(u.first_name || "-")}</td>
-      <td>${escapeHtml(u.last_name || "-")}</td>
+      <td>${escapeHtml(u.first_name || u.firstName || "-")}</td>
+      <td>${escapeHtml(u.last_name || u.lastName || "-")}</td>
       <td>${escapeHtml(u.email)}</td>
       <td>${u.claims}</td>
       <td>${u.created_at}</td>
@@ -159,6 +159,8 @@ function renderClaims(claims) {
     <tr>
       <td>${c.id}</td>
       <td>${escapeHtml(c.username)}</td>
+      <td>${escapeHtml(c.first_name || c.firstName || "-")}</td>
+      <td>${escapeHtml(c.last_name || c.lastName || "-")}</td>
       <td>${escapeHtml(c.email)}</td>
       <td>${escapeHtml(c.label || "-")}</td>
       <td>${escapeHtml(c.user_agent || "-")}</td>
@@ -172,6 +174,8 @@ function renderClaims(claims) {
         <tr>
           <th>ID</th>
           <th>User</th>
+          <th>First Name</th>
+          <th>Last Name</th>
           <th>Email</th>
           <th>Code Label</th>
           <th>User Agent</th>

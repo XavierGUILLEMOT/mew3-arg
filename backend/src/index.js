@@ -345,7 +345,7 @@ async function handleAdminDeleteUser(request, env, cors) {
 async function handleAdminListClaims(url, env, cors) {
   const limit = parseLimit(url.searchParams.get("limit"), 100, 1000);
   const rows = await env.DB.prepare(
-    `SELECT c.id, c.created_at, c.user_agent, u.username, u.email, ac.label
+    `SELECT c.id, c.created_at, c.user_agent, u.username, u.first_name, u.last_name, u.email, ac.label
      FROM claims c
      JOIN users u ON u.id = c.user_id
      JOIN access_codes ac ON ac.id = c.code_id
