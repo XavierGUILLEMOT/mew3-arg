@@ -338,8 +338,11 @@ function initWidget() {
   const iframe = document.getElementById("scPlayer");
   if (!iframe || !window.SC || !window.SC.Widget) return;
   scWidget = window.SC.Widget(iframe);
+
   scWidget.bind(window.SC.Widget.Events.READY, () => {
     scWidget.setVolume(SOUND_VOLUME);
+    // Fallback for iOS where auto_play=true in the URL may be silently blocked.
+    scWidget.play();
   });
   scWidget.bind(window.SC.Widget.Events.PLAY, () => {
     isPlaying = true;
@@ -359,6 +362,16 @@ function initWidget() {
     isPlaying = false;
     updateAudioButtonLabel();
   });
+
+  // Safety net: if PLAY never fires (blocked on iOS), reset so user can tap again.
+  setTimeout(() => {
+    if (isLoading) {
+      scWidget = null;
+      isLoading = false;
+      isPlaying = false;
+      updateAudioButtonLabel();
+    }
+  }, 6000);
 }
 
 function loadTrack(url) {
@@ -368,11 +381,17 @@ function loadTrack(url) {
   isLoading = true;
   isPlaying = false;
   updateAudioButtonLabel();
+  // Bind the widget only AFTER the iframe has finished loading the new URL.
+  // Calling SC.Widget() before onload causes postMessage to target the wrong
+  // window, breaking pause/play commands and event delivery.
+  iframe.onload = () => {
+    iframe.onload = null;
+    initWidget();
+  };
   iframe.src = "https://w.soundcloud.com/player/?url=" + encodeURIComponent(url)
     + "&auto_play=true&hide_related=true&show_comments=false"
     + "&show_user=false&show_reposts=false&visual=false"
     + "&buying=false&sharing=false&download=false&show_playcount=false";
-  initWidget();
 }
 
 function toggleMute() {
