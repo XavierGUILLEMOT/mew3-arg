@@ -13,6 +13,162 @@ const createStatus = document.getElementById("codeCreateStatus");
 const codesTableWrap = document.getElementById("codesTableWrap");
 const usersTableWrap = document.getElementById("usersTableWrap");
 const claimsTableWrap = document.getElementById("claimsTableWrap");
+const LANGUAGE_STORAGE_KEY = "mew3_lang";
+const ADMIN_SUPPORTED_LANGUAGES = ["fr", "en"];
+let adminLanguage = "fr";
+
+const ADMIN_I18N = {
+  fr: {
+    pageTitle: "MEW3 Panneau Admin",
+    langLabelAdmin: "Langue",
+    adminTitle: "MEW3 ADMIN",
+    adminSubtitle: "Gérez les codes, utilisateurs et revendications récentes.",
+    adminTokenLabel: "Jeton admin",
+    adminTokenPlaceholder: "Jeton Bearer",
+    saveTokenBtn: "Enregistrer le jeton",
+    refreshAllBtn: "Tout actualiser",
+    codeSectionTitle: "Créer ou mettre à jour un code",
+    newCodePlaceholder: "code",
+    newLabelPlaceholder: "libellé (optionnel)",
+    newMaxClaimsPlaceholder: "max revendications",
+    createCodeBtn: "Enregistrer le code",
+    accessCodesTitle: "Codes d'accès",
+    usersTitle: "Utilisateurs",
+    recentClaimsTitle: "Revendications récentes",
+    missingAdminToken: "Jeton admin manquant",
+    apiFallbackNotice: "API principale inaccessible, nouvel essai via le fallback...",
+    noCodesYet: "Aucun code pour l'instant.",
+    noUsersYet: "Aucun utilisateur pour l'instant.",
+    noClaimsYet: "Aucune revendication pour l'instant.",
+    setMax: "Définir max",
+    setActive: "Définir actif",
+    delete: "Supprimer",
+    deleteUser: "Supprimer l'utilisateur",
+    thLabel: "Libellé",
+    thClaims: "Revendications",
+    thCreatedAt: "Créé le",
+    thActive: "Actif",
+    thActions: "Actions",
+    thUsername: "Nom d'utilisateur",
+    thFirstName: "Prénom",
+    thLastName: "Nom",
+    thEmail: "Email",
+    thUser: "Utilisateur",
+    thCodeLabel: "Libellé du code",
+    thUserAgent: "Agent utilisateur",
+    connected: "Connecté.",
+    errorPrefix: "Erreur",
+    invalidCodeOrMax: "Code ou nombre max invalide.",
+    codeSaved: "Code enregistré.",
+    confirmDeleteCode: "Supprimer le code",
+    confirmDeleteUser: "Supprimer l'utilisateur",
+    confirmDeleteUserSuffix: "Les revendications seront aussi supprimées.",
+    tokenSavedSession: "Jeton enregistré pour cette session navigateur."
+  },
+  en: {
+    pageTitle: "MEW3 Admin Panel",
+    langLabelAdmin: "Language",
+    adminTitle: "MEW3 ADMIN",
+    adminSubtitle: "Manage codes, users, and recent claims.",
+    adminTokenLabel: "Admin token",
+    adminTokenPlaceholder: "Bearer token",
+    saveTokenBtn: "Save token",
+    refreshAllBtn: "Refresh all",
+    codeSectionTitle: "Create or update code",
+    newCodePlaceholder: "code",
+    newLabelPlaceholder: "label (optional)",
+    newMaxClaimsPlaceholder: "max claims",
+    createCodeBtn: "Save code",
+    accessCodesTitle: "Access codes",
+    usersTitle: "Users",
+    recentClaimsTitle: "Recent claims",
+    missingAdminToken: "Missing admin token",
+    apiFallbackNotice: "Primary API unreachable, retrying via fallback...",
+    noCodesYet: "No codes yet.",
+    noUsersYet: "No users yet.",
+    noClaimsYet: "No claims yet.",
+    setMax: "Set max",
+    setActive: "Set active",
+    delete: "Delete",
+    deleteUser: "Delete user",
+    thLabel: "Label",
+    thClaims: "Claims",
+    thCreatedAt: "Created",
+    thActive: "Active",
+    thActions: "Actions",
+    thUsername: "Username",
+    thFirstName: "First name",
+    thLastName: "Last name",
+    thEmail: "Email",
+    thUser: "User",
+    thCodeLabel: "Code label",
+    thUserAgent: "User agent",
+    connected: "Connected.",
+    errorPrefix: "Error",
+    invalidCodeOrMax: "Invalid code or max claims.",
+    codeSaved: "Code saved.",
+    confirmDeleteCode: "Delete code",
+    confirmDeleteUser: "Delete user",
+    confirmDeleteUserSuffix: "Claims will be deleted too.",
+    tokenSavedSession: "Token saved in current browser session."
+  }
+};
+
+function ta(key) {
+  return (ADMIN_I18N[adminLanguage] && ADMIN_I18N[adminLanguage][key]) || ADMIN_I18N.fr[key] || key;
+}
+
+function detectAdminLanguage() {
+  const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  if (saved && ADMIN_SUPPORTED_LANGUAGES.includes(saved)) {
+    return saved;
+  }
+  const browserLang = (navigator.language || "fr").slice(0, 2).toLowerCase();
+  return ADMIN_SUPPORTED_LANGUAGES.includes(browserLang) ? browserLang : "fr";
+}
+
+function setAdminText(id, key) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.textContent = ta(key);
+  }
+}
+
+function setAdminPlaceholder(id, key) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.placeholder = ta(key);
+  }
+}
+
+function applyAdminLanguage(lang) {
+  adminLanguage = ADMIN_SUPPORTED_LANGUAGES.includes(lang) ? lang : "fr";
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, adminLanguage);
+  document.documentElement.lang = adminLanguage;
+  document.title = ta("pageTitle");
+
+  setAdminText("langLabelAdmin", "langLabelAdmin");
+  setAdminText("adminTitle", "adminTitle");
+  setAdminText("adminSubtitle", "adminSubtitle");
+  setAdminText("adminTokenLabel", "adminTokenLabel");
+  setAdminText("saveTokenBtn", "saveTokenBtn");
+  setAdminText("refreshAllBtn", "refreshAllBtn");
+  setAdminText("codeSectionTitle", "codeSectionTitle");
+  setAdminText("createCodeBtn", "createCodeBtn");
+  setAdminText("accessCodesTitle", "accessCodesTitle");
+  setAdminText("usersTitle", "usersTitle");
+  setAdminText("recentClaimsTitle", "recentClaimsTitle");
+
+  setAdminPlaceholder("adminToken", "adminTokenPlaceholder");
+  setAdminPlaceholder("newCode", "newCodePlaceholder");
+  setAdminPlaceholder("newLabel", "newLabelPlaceholder");
+  setAdminPlaceholder("newMaxClaims", "newMaxClaimsPlaceholder");
+
+  const langSelect = document.getElementById("langSelectAdmin");
+  if (langSelect) {
+    langSelect.value = adminLanguage;
+  }
+}
 
 function getToken() {
   return (tokenInput.value || "").trim();
@@ -26,7 +182,7 @@ function setStatus(el, text, isError = false) {
 async function adminFetch(path, options = {}) {
   const token = getToken();
   if (!token) {
-    throw new Error("Missing admin token");
+    throw new Error(ta("missingAdminToken"));
   }
 
   const requestOptions = {
@@ -52,7 +208,7 @@ async function adminFetch(path, options = {}) {
   } catch (e) {
     // Network-level failures can happen on custom-domain edge rules; fallback to workers.dev.
     if (e && e.message === "Failed to fetch" && API_FALLBACK_URL && API_FALLBACK_URL !== API_BASE_URL) {
-      setStatus(authStatus, "Primary API unreachable, retrying via fallback...", true);
+      setStatus(authStatus, ta("apiFallbackNotice"), true);
       return doRequest(API_FALLBACK_URL);
     }
     throw e;
@@ -70,7 +226,7 @@ function escapeHtml(input) {
 
 function renderCodes(codes) {
   if (!codes.length) {
-    codesTableWrap.innerHTML = "<p>No codes yet.</p>";
+    codesTableWrap.innerHTML = `<p>${escapeHtml(ta("noCodesYet"))}</p>`;
     return;
   }
 
@@ -87,9 +243,9 @@ function renderCodes(codes) {
         <td>
           <div class="action-cell">
             <input class="small-input" type="number" min="1" value="${c.max_claims}" data-code-max="${c.id}">
-            <button data-code-save="${c.id}">Set Max</button>
-            <button data-code-toggle="${c.id}">Set Active</button>
-            <button data-code-delete="${c.id}">Delete</button>
+            <button data-code-save="${c.id}">${escapeHtml(ta("setMax"))}</button>
+            <button data-code-toggle="${c.id}">${escapeHtml(ta("setActive"))}</button>
+            <button data-code-delete="${c.id}">${escapeHtml(ta("delete"))}</button>
           </div>
         </td>
       </tr>`;
@@ -100,12 +256,12 @@ function renderCodes(codes) {
       <thead>
         <tr>
           <th>ID</th>
-          <th>Label</th>
-          <th>Claims</th>
+          <th>${escapeHtml(ta("thLabel"))}</th>
+          <th>${escapeHtml(ta("thClaims"))}</th>
           <th>Max</th>
-          <th>Created</th>
-          <th>Active</th>
-          <th>Actions</th>
+          <th>${escapeHtml(ta("thCreatedAt"))}</th>
+          <th>${escapeHtml(ta("thActive"))}</th>
+          <th>${escapeHtml(ta("thActions"))}</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -114,7 +270,7 @@ function renderCodes(codes) {
 
 function renderUsers(users) {
   if (!users.length) {
-    usersTableWrap.innerHTML = "<p>No users yet.</p>";
+    usersTableWrap.innerHTML = `<p>${escapeHtml(ta("noUsersYet"))}</p>`;
     return;
   }
 
@@ -127,7 +283,7 @@ function renderUsers(users) {
       <td>${escapeHtml(u.email)}</td>
       <td>${u.claims}</td>
       <td>${u.created_at}</td>
-      <td><button data-user-delete="${u.id}">Delete User</button></td>
+      <td><button data-user-delete="${u.id}">${escapeHtml(ta("deleteUser"))}</button></td>
     </tr>
   `).join("");
 
@@ -136,13 +292,13 @@ function renderUsers(users) {
       <thead>
         <tr>
           <th>ID</th>
-          <th>Username</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Email</th>
-          <th>Claims</th>
-          <th>Created</th>
-          <th>Actions</th>
+          <th>${escapeHtml(ta("thUsername"))}</th>
+          <th>${escapeHtml(ta("thFirstName"))}</th>
+          <th>${escapeHtml(ta("thLastName"))}</th>
+          <th>${escapeHtml(ta("thEmail"))}</th>
+          <th>${escapeHtml(ta("thClaims"))}</th>
+          <th>${escapeHtml(ta("thCreatedAt"))}</th>
+          <th>${escapeHtml(ta("thActions"))}</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -151,7 +307,7 @@ function renderUsers(users) {
 
 function renderClaims(claims) {
   if (!claims.length) {
-    claimsTableWrap.innerHTML = "<p>No claims yet.</p>";
+    claimsTableWrap.innerHTML = `<p>${escapeHtml(ta("noClaimsYet"))}</p>`;
     return;
   }
 
@@ -173,13 +329,13 @@ function renderClaims(claims) {
       <thead>
         <tr>
           <th>ID</th>
-          <th>User</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Email</th>
-          <th>Code Label</th>
-          <th>User Agent</th>
-          <th>Created</th>
+          <th>${escapeHtml(ta("thUser"))}</th>
+          <th>${escapeHtml(ta("thFirstName"))}</th>
+          <th>${escapeHtml(ta("thLastName"))}</th>
+          <th>${escapeHtml(ta("thEmail"))}</th>
+          <th>${escapeHtml(ta("thCodeLabel"))}</th>
+          <th>${escapeHtml(ta("thUserAgent"))}</th>
+          <th>${escapeHtml(ta("thCreatedAt"))}</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -197,9 +353,9 @@ async function refreshAll() {
     renderCodes(codes.codes || []);
     renderUsers(users.users || []);
     renderClaims(claims.claims || []);
-    setStatus(authStatus, "Connected.");
+    setStatus(authStatus, ta("connected"));
   } catch (e) {
-    setStatus(authStatus, `Error: ${e.message}`, true);
+    setStatus(authStatus, `${ta("errorPrefix")} : ${e.message}`, true);
   }
 }
 
@@ -209,7 +365,7 @@ async function createOrUpdateCode() {
   const maxClaims = Number.parseInt(document.getElementById("newMaxClaims").value, 10);
 
   if (!code || !Number.isFinite(maxClaims) || maxClaims < 1) {
-    setStatus(createStatus, "Invalid code or max claims.", true);
+    setStatus(createStatus, ta("invalidCodeOrMax"), true);
     return;
   }
 
@@ -218,10 +374,10 @@ async function createOrUpdateCode() {
       method: "POST",
       body: JSON.stringify({ code, label, maxClaims }),
     });
-    setStatus(createStatus, "Code saved.");
+    setStatus(createStatus, ta("codeSaved"));
     await refreshAll();
   } catch (e) {
-    setStatus(createStatus, `Error: ${e.message}`, true);
+    setStatus(createStatus, `${ta("errorPrefix")} : ${e.message}`, true);
   }
 }
 
@@ -257,7 +413,7 @@ async function handleTableClick(event) {
     const deleteCodeBtn = event.target.closest("[data-code-delete]");
     if (deleteCodeBtn) {
       const id = Number(deleteCodeBtn.getAttribute("data-code-delete"));
-      if (!window.confirm(`Delete code #${id}?`)) return;
+      if (!window.confirm(`${ta("confirmDeleteCode")} #${id} ?`)) return;
       await adminFetch("/api/admin/codes/delete", {
         method: "POST",
         body: JSON.stringify({ id }),
@@ -269,7 +425,7 @@ async function handleTableClick(event) {
     const deleteUserBtn = event.target.closest("[data-user-delete]");
     if (deleteUserBtn) {
       const id = Number(deleteUserBtn.getAttribute("data-user-delete"));
-      if (!window.confirm(`Delete user #${id}? Claims will be deleted too.`)) return;
+      if (!window.confirm(`${ta("confirmDeleteUser")} #${id} ? ${ta("confirmDeleteUserSuffix")}`)) return;
       await adminFetch("/api/admin/users/delete", {
         method: "POST",
         body: JSON.stringify({ id }),
@@ -277,17 +433,29 @@ async function handleTableClick(event) {
       await refreshAll();
     }
   } catch (e) {
-    setStatus(authStatus, `Error: ${e.message}`, true);
+    setStatus(authStatus, `${ta("errorPrefix")} : ${e.message}`, true);
   }
 }
 
 function init() {
+  applyAdminLanguage(detectAdminLanguage());
+
   const storedToken = sessionStorage.getItem("mew3_admin_token") || "";
   tokenInput.value = storedToken;
 
+  const langSelect = document.getElementById("langSelectAdmin");
+  if (langSelect) {
+    langSelect.addEventListener("change", (event) => {
+      applyAdminLanguage(event.target.value);
+      if (storedToken) {
+        refreshAll();
+      }
+    });
+  }
+
   document.getElementById("saveTokenBtn").addEventListener("click", () => {
     sessionStorage.setItem("mew3_admin_token", getToken());
-    setStatus(authStatus, "Token saved in current browser session.");
+    setStatus(authStatus, ta("tokenSavedSession"));
   });
 
   document.getElementById("refreshAllBtn").addEventListener("click", refreshAll);

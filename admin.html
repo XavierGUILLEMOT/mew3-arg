@@ -1,52 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MEW3 Admin Panel</title>
+<title>MEW3 Panneau Admin</title>
 <link rel="icon" href="favicon.ico">
 <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 <div class="wrap">
+  <div class="lang-switcher">
+    <label id="langLabelAdmin" for="langSelectAdmin">Langue</label>
+    <select id="langSelectAdmin" aria-label="Sélecteur de langue">
+      <option value="fr">FR</option>
+      <option value="en">EN</option>
+    </select>
+  </div>
+
   <header class="panel">
-    <h1>MEW3 ADMIN</h1>
-    <p>Manage codes, users, and recent claims.</p>
+    <h1 id="adminTitle">MEW3 ADMIN</h1>
+    <p id="adminSubtitle">Gérez les codes, utilisateurs et revendications récentes.</p>
   </header>
 
   <section class="panel auth">
-    <label for="adminToken">Admin Token</label>
+    <label id="adminTokenLabel" for="adminToken">Jeton admin</label>
     <div class="row">
-      <input id="adminToken" type="password" placeholder="Bearer token">
-      <button id="saveTokenBtn">Save Token</button>
-      <button id="refreshAllBtn">Refresh All</button>
+      <input id="adminToken" type="password" placeholder="Jeton Bearer">
+      <button id="saveTokenBtn">Enregistrer le jeton</button>
+      <button id="refreshAllBtn">Tout actualiser</button>
     </div>
     <p id="authStatus" class="status"></p>
   </section>
 
   <section class="panel">
-    <h2>Create or Update Code</h2>
+    <h2 id="codeSectionTitle">Créer ou mettre à jour un code</h2>
     <div class="row form-grid">
       <input id="newCode" placeholder="code">
-      <input id="newLabel" placeholder="label (optional)">
-      <input id="newMaxClaims" type="number" min="1" value="100" placeholder="max claims">
-      <button id="createCodeBtn">Save Code</button>
+      <input id="newLabel" placeholder="libellé (optionnel)">
+      <input id="newMaxClaims" type="number" min="1" value="100" placeholder="max revendications">
+      <button id="createCodeBtn">Enregistrer le code</button>
     </div>
     <p id="codeCreateStatus" class="status"></p>
   </section>
 
   <section class="panel">
-    <h2>Access Codes</h2>
+    <h2 id="accessCodesTitle">Codes d'accès</h2>
     <div id="codesTableWrap" class="table-wrap"></div>
   </section>
 
   <section class="panel">
-    <h2>Users</h2>
+    <h2 id="usersTitle">Utilisateurs</h2>
     <div id="usersTableWrap" class="table-wrap"></div>
   </section>
 
   <section class="panel">
-    <h2>Recent Claims</h2>
+    <h2 id="recentClaimsTitle">Revendications récentes</h2>
     <div id="claimsTableWrap" class="table-wrap"></div>
   </section>
 </div>

@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="YOU ARE WATCHING. Multiple keys are hidden. First come, first served.">
+<meta name="description" content="VOUS ÊTES OBSERVÉ. Plusieurs clés sont cachées. Premier arrivé, premier servi.">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MEW3">
 <meta property="og:url" content="https://mew3.online/">
-<meta property="og:title" content="MEW3 - YOU ARE WATCHING NOW">
-<meta property="og:description" content="Multiple keys are hidden. First come, first served. Will you find them?">
+<meta property="og:title" content="MEW3 - VOUS ÊTES OBSERVÉ MAINTENANT">
+<meta property="og:description" content="Plusieurs clés sont cachées. Premier arrivé, premier servi. Les trouverez-vous ?">
 <meta property="og:image" content="https://mew3.online/MEW3.png">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="MEW3 - YOU ARE WATCHING NOW">
-<meta name="twitter:description" content="Multiple keys are hidden. First come, first served. Will you find them?">
+<meta name="twitter:title" content="MEW3 - VOUS ÊTES OBSERVÉ MAINTENANT">
+<meta name="twitter:description" content="Plusieurs clés sont cachées. Premier arrivé, premier servi. Les trouverez-vous ?">
 <meta name="twitter:image" content="https://mew3.online/MEW3.png">
 
-<title>YOU ARE WATCHING NOW</title>
+<title>VOUS ÊTES OBSERVÉ MAINTENANT</title>
 
 <link rel="icon" href="favicon.ico">
 <link rel="stylesheet" href="style.css">
@@ -40,46 +40,54 @@ src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/czer46/edge-l
 
 <div class="screen"></div>
 
+<div class="lang-switcher">
+<label id="langLabel" for="langSelect">Langue</label>
+<select id="langSelect" aria-label="Sélecteur de langue">
+<option value="fr">FR</option>
+<option value="en">EN</option>
+</select>
+</div>
+
 <div id="inAppCornerHint" class="in-app-corner-hint" hidden>
-<span class="hint-label">OPEN IN BROWSER</span>
+<span id="inAppCornerHintLabel" class="hint-label">OUVRIR DANS LE NAVIGATEUR</span>
 <span class="hint-arrow">↗</span>
 </div>
 
 <div class="container">
 
 <div id="inAppNotice" class="in-app-notice" hidden>
-Open in your external browser for full experience (audio + code verification).
-Instagram: tap ⋮ then "Open in browser".
+Ouvrez dans votre navigateur externe pour une expérience complète (audio + vérification du code).
+Instagram : appuyez sur ⋮ puis "Ouvrir dans le navigateur".
 </div>
 
 <!-- Audio Controls -->
 <div class="audio-controls">
-<button id="muteBtn" class="mute-btn" onclick="toggleMute()" aria-label="Toggle audio">AUDIO ON</button>
-<button id="nextBtn" class="next-btn" onclick="nextTrack()" aria-label="Play a random next track">NEXT</button>
-<a href="https://soundcloud.com/czer46/edge-live-xtract" target="_blank" class="now-playing">
-Playing - EDGE [LIVE XTRACT] #49 | Adelphe
+<button id="muteBtn" class="mute-btn" onclick="toggleMute()" aria-label="Activer ou couper l'audio">AUDIO ACTIVÉ</button>
+<button id="nextBtn" class="next-btn" onclick="nextTrack()" aria-label="Lire la piste suivante">SUIVANT</button>
+<a id="nowPlayingLink" href="https://soundcloud.com/czer46/edge-live-xtract" target="_blank" class="now-playing">
+Lecture - EDGE [LIVE XTRACT] #49 | Adelphe
 </a>
 </div>
 
-<a href="https://www.instagram.com/mew3.sound" target="_blank" rel="noopener noreferrer" class="mew3-link" aria-label="Open MEW3 Instagram">
+<a href="https://www.instagram.com/mew3.sound" target="_blank" rel="noopener noreferrer" class="mew3-link" aria-label="Ouvrir Instagram MEW3">
 <img src="MEW3GIF.gif" alt="MEW3" class="mew3-image">
 </a>
 
-<div class="boot">
-> CONNECTED TO MEW3.ONLINE </br>
-> YOU ARE WATCHING </br>
-> MULTIPLE KEYS ARE HIDDEN. SOMEWHERE. </br>
-> FIRST COME, FIRST SERVED. </br>
-> WILL YOU FIND THEM ?
+<div id="bootText" class="boot">
+> CONNECTÉ À MEW3.ONLINE </br>
+> VOUS OBSERVEZ </br>
+> PLUSIEURS CLÉS SONT CACHÉES. QUELQUE PART. </br>
+> PREMIER ARRIVÉ, PREMIER SERVI. </br>
+> LES TROUVEREZ-VOUS ?
 </div>
 
 <div class="access-box">
 
-<h2>ENTER CODE</h2>
+<h2 id="accessTitle">ENTRER LE CODE</h2>
 
 <div class="input-group">
 
-<input id="codeInput" placeholder="ACCESS KEY">
+<input id="codeInput" placeholder="CLÉ D'ACCÈS">
 <!--
 YOU SEEM CURIOUS.
 
@@ -89,7 +97,7 @@ BUT IF YOU DO...
 
 MAYBE THE ANSWER IS OBVIOUS.
 -->
-<button onclick="verifyCode()">VERIFY</button>
+<button id="verifyBtn" onclick="verifyCode()">VÉRIFIER</button>
 
 </div>
 
@@ -99,18 +107,18 @@ MAYBE THE ANSWER IS OBVIOUS.
 
 <!-- Billeterie Link -->
 <a href="https://shotgun.live/fr/events/mew-3-is-watching" target="_blank" class="billeterie-link">
-  GET TICKETS - CO2 - NANTES - 02/04/2026
+  <span id="ticketLabel">BILLETS - CO2 - NANTES - 02/04/2026</span>
 </a>
 
 <div class="counter">
 
-▣ <span id="subjectCount">0</span> SUBJECTS IDENTIFIED
+▣ <span id="subjectCount">0</span> <span id="subjectsLabel">SUJETS IDENTIFIÉS</span>
 
 </div>
 
 <div class="leaderboard">
 
-<h3>RECENT SUBJECTS</h3>
+<h3 id="recentSubjectsTitle">SUJETS RÉCENTS</h3>
 
 <ul id="playersList">
 
@@ -130,18 +138,18 @@ MAYBE THE ANSWER IS OBVIOUS.
 
 <div class="popup-content">
 
-<h2>SUBJECT IDENTIFICATION REQUIRED</h2>
+<h2 id="popupTitle">IDENTIFICATION DU SUJET REQUISE</h2>
 
-<input id="username" placeholder="Username">
-<input id="firstName" placeholder="First name">
-<input id="lastName" placeholder="Last name">
+<input id="username" placeholder="Nom d'utilisateur">
+<input id="firstName" placeholder="Prénom">
+<input id="lastName" placeholder="Nom">
 <input id="email" placeholder="Email">
 
-<p class="privacy-note">
-Only your username will be public. Your first name, last name and email stay confidential and are used only to deliver rewards.
+<p id="privacyNote" class="privacy-note">
+Seul votre nom d'utilisateur sera public. Votre prénom, nom et email restent confidentiels et servent uniquement à l'envoi des récompenses.
 </p>
 
-<button onclick="register()">WATCH</button>
+<button id="registerBtn" onclick="register()">OBSERVER</button>
 
 </div>
 
