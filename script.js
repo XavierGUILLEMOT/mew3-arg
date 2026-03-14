@@ -10,13 +10,9 @@ const playlist = [
 
 let currentTrack = null;
 let currentTrackIndex = -1;
-let hasStarted = false;   // user has pressed play at least once
-let isPlaying = false;    // audio is currently playing
-let isLoading = false;    // widget is initialising
-let audioError = false;
 let scWidget = null;
-let scReady = false;
-let widgetReadyPromise = null;
+let isPlaying = false;
+let isLoading = false;
 const SOUND_VOLUME = 35;
 let pendingCode = null;
 const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
@@ -324,162 +320,85 @@ function updateNowPlaying(){
   link.innerText = `${t("nowPlayingPrefix")} - ${currentTrack.title}`;
 }
 
-function updateAudioButtonLabel(){
+function updateAudioButtonLabel() {
   const btn = document.getElementById("muteBtn");
-  if(!btn) return;
-
-  if(audioError){
-    btn.innerText = t("audioError");
-  } else if(isLoading){
+  if (!btn) return;
+  if (isLoading) {
     btn.innerText = t("loadingAudio");
-  } else if(isPlaying){
+  } else if (isPlaying) {
     btn.innerText = t("audioOn");
-  } else if(hasStarted){
+  } else if (scWidget) {
     btn.innerText = t("audioOff");
   } else {
     btn.innerText = t("startAudio");
   }
 }
 
-function ensureWidgetReady(){
-  if(scReady && scWidget) return Promise.resolve();
-  if(widgetReadyPromise) return widgetReadyPromise;
-
-  widgetReadyPromise = new Promise((resolve, reject) => {
-    const iframe = document.getElementById("scPlayer");
-    if(!iframe || !window.SC || !window.SC.Widget){
-      widgetReadyPromise = null;
-      reject(new Error("soundcloud_unavailable"));
-      return;
-    }
-
-    scWidget = window.SC.Widget(iframe);
-    let settled = false;
-
-    const markReady = () => {
-      if(settled) return;
-      settled = true;
-      scReady = true;
-      audioError = false;
-      scWidget.setVolume(SOUND_VOLUME);
-      isLoading = false;
-      // We always load with auto_play=true, so assume playback has started.
-      // The PLAY event fires slightly after READY; without this the button
-      // would briefly show "AUDIO COUPÉ" and further taps would be ignored.
-      if(hasStarted) isPlaying = true;
-      updateAudioButtonLabel();
-      resolve();
-    };
-
-    const failReady = () => {
-      audioError = true;
-      isLoading = false;
-      updateAudioButtonLabel();
-      if(!settled){
-        settled = true;
-        widgetReadyPromise = null;
-        reject(new Error("soundcloud_widget_error"));
-      }
-    };
-
-    scWidget.bind(window.SC.Widget.Events.READY, markReady);
-    scWidget.bind(window.SC.Widget.Events.PLAY, () => {
-      isPlaying = true;
-      isLoading = false;
-      audioError = false;
-      updateAudioButtonLabel();
-    });
-    scWidget.bind(window.SC.Widget.Events.PAUSE, () => {
-      isPlaying = false;
-      updateAudioButtonLabel();
-    });
-    scWidget.bind(window.SC.Widget.Events.FINISH, () => {
-      isPlaying = false;
-      if(hasStarted) nextTrack();
-    });
-    scWidget.bind(window.SC.Widget.Events.ERROR, failReady);
-
-    setTimeout(() => { if(!settled) failReady(); }, 8000);
-  });
-
-  return widgetReadyPromise;
-}
-
-// Loads a track URL into the iframe via src swap and starts playback.
-// This is the only reliable way to start audio on iOS Safari because
-// widget.play() goes through postMessage (async) and breaks the gesture chain.
-function loadAndPlayViaIframe(url){
+function initWidget() {
   const iframe = document.getElementById("scPlayer");
-  if(!iframe) return;
-  scWidget = null;
-  scReady = false;
-  widgetReadyPromise = null;
-  isLoading = true;
-  isPlaying = false;
-  updateAudioButtonLabel();
-  const encodedUrl = encodeURIComponent(url);
-  iframe.src = "https://w.soundcloud.com/player/?url=" + encodedUrl
-    + "&auto_play=true&hide_related=true&show_comments=false"
-    + "&show_user=false&show_reposts=false&visual=false"
-    + "&buying=false&sharing=false&download=false&show_playcount=false";
-  ensureWidgetReady().catch(() => {
-    audioError = true;
+  if (!iframe || !window.SC || !window.SC.Widget) return;
+  scWidget = window.SC.Widget(iframe);
+  scWidget.bind(window.SC.Widget.Events.READY, () => {
+    scWidget.setVolume(SOUND_VOLUME);
+  });
+  scWidget.bind(window.SC.Widget.Events.PLAY, () => {
+    isPlaying = true;
     isLoading = false;
+    updateAudioButtonLabel();
+  });
+  scWidget.bind(window.SC.Widget.Events.PAUSE, () => {
+    isPlaying = false;
+    updateAudioButtonLabel();
+  });
+  scWidget.bind(window.SC.Widget.Events.FINISH, () => {
+    isPlaying = false;
+    nextTrack();
+  });
+  scWidget.bind(window.SC.Widget.Events.ERROR, () => {
+    isLoading = false;
+    isPlaying = false;
     updateAudioButtonLabel();
   });
 }
 
-// Called by the AUDIO button (onclick="toggleMute()")
-function toggleMute(){
-  if(audioError){
-    // Reset and retry from scratch
-    audioError = false;
-    hasStarted = false;
-    isPlaying = false;
-    isLoading = false;
-    scWidget = null;
-    scReady = false;
-    widgetReadyPromise = null;
-  }
+function loadTrack(url) {
+  const iframe = document.getElementById("scPlayer");
+  if (!iframe) return;
+  scWidget = null;
+  isLoading = true;
+  isPlaying = false;
+  updateAudioButtonLabel();
+  iframe.src = "https://w.soundcloud.com/player/?url=" + encodeURIComponent(url)
+    + "&auto_play=true&hide_related=true&show_comments=false"
+    + "&show_user=false&show_reposts=false&visual=false"
+    + "&buying=false&sharing=false&download=false&show_playcount=false";
+  initWidget();
+}
 
-  if(!hasStarted){
-    // First press: pick a random track and start playing
-    hasStarted = true;
-    if(currentTrackIndex < 0){
+function toggleMute() {
+  if (isLoading) return;
+  if (!scWidget) {
+    if (currentTrackIndex < 0) {
       currentTrackIndex = pickRandomTrackIndex();
       currentTrack = playlist[currentTrackIndex];
       updateNowPlaying();
     }
-    loadAndPlayViaIframe(currentTrack.url);
+    loadTrack(currentTrack.url);
     return;
   }
-
-  // Widget not ready yet (still loading) — ignore extra taps
-  if(!scReady || !scWidget) return;
-
-  if(isPlaying){
+  if (isPlaying) {
     scWidget.pause();
   } else {
     scWidget.play();
   }
 }
 
-function nextTrack(){
-  if(!playlist.length) return;
-
-  const nextIndex = currentTrackIndex < 0
-    ? 0
-    : (currentTrackIndex + 1) % playlist.length;
-
-  currentTrackIndex = nextIndex;
+function nextTrack() {
+  if (!playlist.length) return;
+  currentTrackIndex = currentTrackIndex < 0 ? 0 : (currentTrackIndex + 1) % playlist.length;
   currentTrack = playlist[currentTrackIndex];
   updateNowPlaying();
-
-  // If user hasn't started audio yet, just update the label
-  if(!hasStarted) return;
-
-  // Swap src so next track starts playing straight away
-  loadAndPlayViaIframe(currentTrack.url);
+  if (scWidget) loadTrack(currentTrack.url);
 }
 
 window.onload = function(){
@@ -494,7 +413,6 @@ window.onload = function(){
 
   showInAppNotice();
 
-  // Pick a random track for the "now playing" label — no widget init until button press.
   currentTrackIndex = pickRandomTrackIndex();
   currentTrack = playlist[currentTrackIndex];
   updateNowPlaying();
