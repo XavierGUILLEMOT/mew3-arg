@@ -3,7 +3,7 @@ const playlist = [
   { title: "EDGE | Adelphe", url: "https://soundcloud.com/czer46/edge-live-xtract" },
   // Add more tracks here (max 5):
   { title: "Dissolving the illusion | Xelacid", url: "https://soundcloud.com/user-915783576/dissolving-the-illussion-back" },
-  // { title: "Track Title", url: "https://soundcloud.com/..." },
+  { title: "Conscience | Adelphe", url: "https://soundcloud.com/czer46/conscience" },
   // { title: "Track Title", url: "https://soundcloud.com/..." },
   // { title: "Track Title", url: "https://soundcloud.com/..." },
 ];
