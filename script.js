@@ -12,7 +12,6 @@ let currentTrack = null;
 let currentTrackIndex = -1;
 let scWidget = null;
 let isPlaying = false;
-let isLoading = false;
 const SOUND_VOLUME = 35;
 let pendingCode = null;
 const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
@@ -323,9 +322,7 @@ function updateNowPlaying(){
 function updateAudioButtonLabel() {
   const btn = document.getElementById("muteBtn");
   if (!btn) return;
-  if (isLoading) {
-    btn.innerText = t("loadingAudio");
-  } else if (isPlaying) {
+  if (isPlaying) {
     btn.innerText = t("audioOn");
   } else if (scWidget) {
     btn.innerText = t("audioOff");
@@ -346,7 +343,6 @@ function initWidget() {
   });
   scWidget.bind(window.SC.Widget.Events.PLAY, () => {
     isPlaying = true;
-    isLoading = false;
     updateAudioButtonLabel();
   });
   scWidget.bind(window.SC.Widget.Events.PAUSE, () => {
@@ -358,27 +354,15 @@ function initWidget() {
     nextTrack();
   });
   scWidget.bind(window.SC.Widget.Events.ERROR, () => {
-    isLoading = false;
     isPlaying = false;
     updateAudioButtonLabel();
   });
-
-  // Safety net: if PLAY never fires (blocked on iOS), reset so user can tap again.
-  setTimeout(() => {
-    if (isLoading) {
-      scWidget = null;
-      isLoading = false;
-      isPlaying = false;
-      updateAudioButtonLabel();
-    }
-  }, 6000);
 }
 
 function loadTrack(url) {
   const iframe = document.getElementById("scPlayer");
   if (!iframe) return;
   scWidget = null;
-  isLoading = true;
   isPlaying = false;
   updateAudioButtonLabel();
   // Bind the widget only AFTER the iframe has finished loading the new URL.
@@ -395,7 +379,6 @@ function loadTrack(url) {
 }
 
 function toggleMute() {
-  if (isLoading) return;
   if (!scWidget) {
     if (currentTrackIndex < 0) {
       currentTrackIndex = pickRandomTrackIndex();
