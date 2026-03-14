@@ -363,6 +363,10 @@ function ensureWidgetReady(){
       audioError = false;
       scWidget.setVolume(SOUND_VOLUME);
       isLoading = false;
+      // We always load with auto_play=true, so assume playback has started.
+      // The PLAY event fires slightly after READY; without this the button
+      // would briefly show "AUDIO COUPÉ" and further taps would be ignored.
+      if(hasStarted) isPlaying = true;
       updateAudioButtonLabel();
       resolve();
     };
