@@ -10,20 +10,14 @@ const playlist = [
 
 let currentTrack = null;
 let currentTrackIndex = -1;
-let hasUserStartedAudio = false;
+let hasStarted = false;   // user has pressed play at least once
+let isPlaying = false;    // audio is currently playing
+let isLoading = false;    // widget is initialising
+let audioError = false;
 let scWidget = null;
 let scReady = false;
-let playbackConfirmed = false;
-let isAudioLoading = false;
-let isMuted = false;
-let audioError = false;
 let widgetReadyPromise = null;
-let playAttemptId = 0;
-let playTimeoutId = null;
-let needsUserGestureRetry = false;
 const SOUND_VOLUME = 35;
-const PLAY_RETRY_DELAYS = [0, 300, 900, 1800];
-const PLAY_ATTEMPT_TIMEOUT = 3200;
 let pendingCode = null;
 const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
   ? window.APP_CONFIG.API_BASE_URL.replace(/\/$/, "")
@@ -325,54 +319,31 @@ function pickRandomTrackIndex(){
 
 function updateNowPlaying(){
   const link = document.querySelector(".now-playing");
-  if(!link || !currentTrack){
-    return;
-  }
-
+  if(!link || !currentTrack) return;
   link.href = currentTrack.url;
   link.innerText = `${t("nowPlayingPrefix")} - ${currentTrack.title}`;
 }
 
 function updateAudioButtonLabel(){
   const btn = document.getElementById("muteBtn");
-  if(!btn){
-    return;
-  }
+  if(!btn) return;
 
   if(audioError){
     btn.innerText = t("audioError");
-    return;
-  }
-
-  if(!hasUserStartedAudio){
-    btn.innerText = t("startAudio");
-    return;
-  }
-
-  if(isAudioLoading){
+  } else if(isLoading){
     btn.innerText = t("loadingAudio");
-    return;
-  }
-
-  if(isMuted){
-    btn.innerText = t("audioOff");
-  }else if(needsUserGestureRetry){
-    btn.innerText = t("tapToUnlock");
-  }else if(playbackConfirmed){
+  } else if(isPlaying){
     btn.innerText = t("audioOn");
-  }else{
-    btn.innerText = t("retryAudio");
+  } else if(hasStarted){
+    btn.innerText = t("audioOff");
+  } else {
+    btn.innerText = t("startAudio");
   }
 }
 
 function ensureWidgetReady(){
-  if(scReady && scWidget){
-    return Promise.resolve();
-  }
-
-  if(widgetReadyPromise){
-    return widgetReadyPromise;
-  }
+  if(scReady && scWidget) return Promise.resolve();
+  if(widgetReadyPromise) return widgetReadyPromise;
 
   widgetReadyPromise = new Promise((resolve, reject) => {
     const iframe = document.getElementById("scPlayer");
@@ -386,20 +357,19 @@ function ensureWidgetReady(){
     let settled = false;
 
     const markReady = () => {
-      if(settled){
-        return;
-      }
+      if(settled) return;
       settled = true;
       scReady = true;
       audioError = false;
-      applyWidgetVolume();
+      scWidget.setVolume(SOUND_VOLUME);
+      isLoading = false;
       updateAudioButtonLabel();
       resolve();
     };
 
     const failReady = () => {
       audioError = true;
-      isAudioLoading = false;
+      isLoading = false;
       updateAudioButtonLabel();
       if(!settled){
         settled = true;
@@ -409,272 +379,103 @@ function ensureWidgetReady(){
     };
 
     scWidget.bind(window.SC.Widget.Events.READY, markReady);
-
     scWidget.bind(window.SC.Widget.Events.PLAY, () => {
-      playbackConfirmed = true;
-      isAudioLoading = false;
+      isPlaying = true;
+      isLoading = false;
       audioError = false;
-      needsUserGestureRetry = false;
-      if(playTimeoutId){
-        clearTimeout(playTimeoutId);
-        playTimeoutId = null;
-      }
       updateAudioButtonLabel();
     });
-
     scWidget.bind(window.SC.Widget.Events.PAUSE, () => {
-      if(!isMuted){
-        playbackConfirmed = false;
-      }
+      isPlaying = false;
+      updateAudioButtonLabel();
     });
-
     scWidget.bind(window.SC.Widget.Events.FINISH, () => {
-      if(hasUserStartedAudio && !isMuted){
-        nextTrack();
-      }
+      isPlaying = false;
+      if(hasStarted) nextTrack();
     });
-
     scWidget.bind(window.SC.Widget.Events.ERROR, failReady);
 
-    setTimeout(() => {
-      if(!settled){
-        failReady();
-      }
-    }, 6000);
+    setTimeout(() => { if(!settled) failReady(); }, 8000);
   });
 
   return widgetReadyPromise;
 }
 
-function clearPlayAttemptTimeout(){
-  if(playTimeoutId){
-    clearTimeout(playTimeoutId);
-    playTimeoutId = null;
-  }
-}
-
-function requestPlayWithRetries(){
-  if(!scWidget || isMuted){
-    return;
-  }
-
-  playAttemptId += 1;
-  const thisAttempt = playAttemptId;
-
-  isAudioLoading = true;
-  audioError = false;
-  needsUserGestureRetry = false;
+// Loads a track URL into the iframe via src swap and starts playback.
+// This is the only reliable way to start audio on iOS Safari because
+// widget.play() goes through postMessage (async) and breaks the gesture chain.
+function loadAndPlayViaIframe(url){
+  const iframe = document.getElementById("scPlayer");
+  if(!iframe) return;
+  scWidget = null;
+  scReady = false;
+  widgetReadyPromise = null;
+  isLoading = true;
+  isPlaying = false;
   updateAudioButtonLabel();
-
-  clearPlayAttemptTimeout();
-
-  PLAY_RETRY_DELAYS.forEach((delay) => {
-    setTimeout(() => {
-      if(thisAttempt !== playAttemptId || !scWidget || isMuted || playbackConfirmed){
-        return;
-      }
-      try{
-        scWidget.play();
-      }catch(_e){
-        // Keep silent and continue retries.
-      }
-    }, delay);
+  const encodedUrl = encodeURIComponent(url);
+  iframe.src = "https://w.soundcloud.com/player/?url=" + encodedUrl
+    + "&auto_play=true&hide_related=true&show_comments=false"
+    + "&show_user=false&show_reposts=false&visual=false"
+    + "&buying=false&sharing=false&download=false&show_playcount=false";
+  ensureWidgetReady().catch(() => {
+    audioError = true;
+    isLoading = false;
+    updateAudioButtonLabel();
   });
-
-  playTimeoutId = setTimeout(() => {
-    if(thisAttempt !== playAttemptId || !scWidget){
-      return;
-    }
-
-    scWidget.isPaused((paused) => {
-      if(thisAttempt !== playAttemptId){
-        return;
-      }
-
-      if(paused === false){
-        playbackConfirmed = true;
-      }
-
-      if(!playbackConfirmed){
-        isAudioLoading = false;
-        if(hasUserStartedAudio && !isMuted){
-          needsUserGestureRetry = true;
-        }
-      }
-      updateAudioButtonLabel();
-    });
-
-    if(!playbackConfirmed){
-      isAudioLoading = false;
-      if(hasUserStartedAudio && !isMuted){
-        needsUserGestureRetry = true;
-      }
-      updateAudioButtonLabel();
-    }
-  }, PLAY_ATTEMPT_TIMEOUT);
 }
 
-function triggerPlayFromGesture(){
-  if(!scWidget || isMuted){
-    return;
+// Called by the AUDIO button (onclick="toggleMute()")
+function toggleMute(){
+  if(audioError){
+    // Reset and retry from scratch
+    audioError = false;
+    hasStarted = false;
+    isPlaying = false;
+    isLoading = false;
+    scWidget = null;
+    scReady = false;
+    widgetReadyPromise = null;
   }
 
-  try{
-    scWidget.play();
-  }catch(_e){
-    // Retry flow below still handles browsers that reject direct play.
-  }
-
-  requestPlayWithRetries();
-}
-
-function applyWidgetVolume(){
-  if(!scWidget){
-    return;
-  }
-  scWidget.setVolume(isMuted ? 0 : SOUND_VOLUME);
-}
-
-function loadTrack(index, autoplay){
-  currentTrackIndex = index;
-  currentTrack = playlist[index];
-  updateNowPlaying();
-
-  if(!scWidget){
-    return;
-  }
-
-  playbackConfirmed = false;
-  audioError = false;
-  isAudioLoading = Boolean(autoplay && !isMuted);
-  needsUserGestureRetry = false;
-
-  scWidget.load(currentTrack.url, {
-    auto_play: Boolean(autoplay),
-    buying: false,
-    sharing: false,
-    download: false,
-    show_artwork: false,
-    show_comments: false,
-    show_playcount: false,
-    show_user: false,
-    show_reposts: false,
-    hide_related: true,
-    visual: false,
-  });
-
-  applyWidgetVolume();
-
-  if(autoplay && !isMuted){
-    requestPlayWithRetries();
-  }
-
-  updateAudioButtonLabel();
-}
-
-function startPlaying(){
-  hasUserStartedAudio = true;
-  isMuted = false;
-  playbackConfirmed = false;
-  isAudioLoading = true;
-  audioError = false;
-  needsUserGestureRetry = false;
-  updateAudioButtonLabel();
-
-  const startWhenReady = () => {
+  if(!hasStarted){
+    // First press: pick a random track and start playing
+    hasStarted = true;
     if(currentTrackIndex < 0){
       currentTrackIndex = pickRandomTrackIndex();
+      currentTrack = playlist[currentTrackIndex];
+      updateNowPlaying();
     }
-
-    // Keep widget load separate from play; explicit play is more reliable on mobile gesture rules.
-    loadTrack(currentTrackIndex, false);
-    triggerPlayFromGesture();
-    updateAudioButtonLabel();
-  };
-
-  if(scWidget && scReady){
-    startWhenReady();
+    loadAndPlayViaIframe(currentTrack.url);
     return;
   }
 
-  // Mobile autoplay policy: play() must be called synchronously inside the
-  // user gesture. If the widget exists but READY hasn't fired yet, call play()
-  // now to preserve the gesture context; the async handler finishes the setup.
-  if(scWidget){
-    try{ scWidget.play(); }catch(_e){}
-  }
+  // Widget not ready yet (still loading) — ignore extra taps
+  if(!scReady || !scWidget) return;
 
-  ensureWidgetReady()
-    .then(() => {
-      if(hasUserStartedAudio && !isMuted){
-        startWhenReady();
-      }
-    })
-    .catch(() => {
-      audioError = true;
-      isAudioLoading = false;
-      updateAudioButtonLabel();
-    });
+  if(isPlaying){
+    scWidget.pause();
+  } else {
+    scWidget.play();
+  }
 }
 
-function loadRandomTrack(){
-  const nextIndex = pickRandomTrackIndex();
-  if(currentTrackIndex < 0){
-    loadTrack(nextIndex, false);
-    updateAudioButtonLabel();
-    return;
-  }
-
-  loadTrack(nextIndex, hasUserStartedAudio);
-}
-
-async function nextTrack(){
-  if(!playlist.length){
-    return;
-  }
-
-  await ensureWidgetReady().catch(() => {});
-
-  if(!scWidget){
-    return;
-  }
+function nextTrack(){
+  if(!playlist.length) return;
 
   const nextIndex = currentTrackIndex < 0
     ? 0
     : (currentTrackIndex + 1) % playlist.length;
 
-  loadTrack(nextIndex, hasUserStartedAudio && !isMuted);
-}
+  currentTrackIndex = nextIndex;
+  currentTrack = playlist[currentTrackIndex];
+  updateNowPlaying();
 
-function toggleMute(){
-  if(!hasUserStartedAudio){
-    startPlaying();
-    return;
-  }
+  // If user hasn't started audio yet, just update the label
+  if(!hasStarted) return;
 
-  if(audioError){
-    startPlaying();
-    return;
-  }
-
-  isMuted = !isMuted;
-  applyWidgetVolume();
-
-  if(isMuted){
-    playbackConfirmed = false;
-    isAudioLoading = false;
-    needsUserGestureRetry = false;
-    clearPlayAttemptTimeout();
-    if(scWidget){
-      scWidget.pause();
-    }
-  }else if(scWidget){
-    // Call play() immediately within the gesture for mobile autoplay policy.
-    try{ scWidget.play(); }catch(_e){}
-    requestPlayWithRetries();
-  }
-
-  updateAudioButtonLabel();
+  // Swap src so next track starts playing straight away
+  loadAndPlayViaIframe(currentTrack.url);
 }
 
 window.onload = function(){
@@ -688,33 +489,13 @@ window.onload = function(){
   }
 
   showInAppNotice();
+
+  // Pick a random track for the "now playing" label — no widget init until button press.
+  currentTrackIndex = pickRandomTrackIndex();
+  currentTrack = playlist[currentTrackIndex];
+  updateNowPlaying();
   updateAudioButtonLabel();
-  loadRandomTrack();
   refreshStats();
-
-  // Prime the widget early but keep autoplay disabled until explicit user action.
-  ensureWidgetReady()
-    .then(() => {
-      if(currentTrackIndex >= 0){
-        loadTrack(currentTrackIndex, false);
-      }
-    })
-    .catch(() => {
-      audioError = true;
-      isAudioLoading = false;
-      updateAudioButtonLabel();
-    });
-
-  const unlockAudio = () => {
-    if(scWidget && hasUserStartedAudio && !isMuted && !playbackConfirmed){
-      // Immediate play() within gesture before async retries.
-      try{ scWidget.play(); }catch(_e){}
-      requestPlayWithRetries();
-    }
-  };
-
-  document.addEventListener("pointerdown", unlockAudio, { passive: true });
-  document.addEventListener("touchstart", unlockAudio, { passive: true });
 };
 
 async function verifyCode(){
