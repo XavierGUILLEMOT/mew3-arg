@@ -12,6 +12,7 @@ let currentTrack = null;
 let currentTrackIndex = -1;
 let scWidget = null;
 let isPlaying = false;
+let hasStarted = false;
 const SOUND_VOLUME = 35;
 let pendingCode = null;
 const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL)
@@ -324,7 +325,7 @@ function updateAudioButtonLabel() {
   if (!btn) return;
   if (isPlaying) {
     btn.innerText = t("audioOn");
-  } else if (scWidget) {
+  } else if (hasStarted) {
     btn.innerText = t("audioOff");
   } else {
     btn.innerText = t("startAudio");
@@ -358,6 +359,7 @@ function initWidget() {
 
 function toggleMute() {
   if (!scWidget) return;
+  hasStarted = true;
   if (isPlaying) {
     scWidget.pause();
   } else {
