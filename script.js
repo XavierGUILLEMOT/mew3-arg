@@ -597,6 +597,13 @@ function startPlaying(){
     return;
   }
 
+  // Mobile autoplay policy: play() must be called synchronously inside the
+  // user gesture. If the widget exists but READY hasn't fired yet, call play()
+  // now to preserve the gesture context; the async handler finishes the setup.
+  if(scWidget){
+    try{ scWidget.play(); }catch(_e){}
+  }
+
   ensureWidgetReady()
     .then(() => {
       if(hasUserStartedAudio && !isMuted){
@@ -662,6 +669,8 @@ function toggleMute(){
       scWidget.pause();
     }
   }else if(scWidget){
+    // Call play() immediately within the gesture for mobile autoplay policy.
+    try{ scWidget.play(); }catch(_e){}
     requestPlayWithRetries();
   }
 
@@ -698,6 +707,8 @@ window.onload = function(){
 
   const unlockAudio = () => {
     if(scWidget && hasUserStartedAudio && !isMuted && !playbackConfirmed){
+      // Immediate play() within gesture before async retries.
+      try{ scWidget.play(); }catch(_e){}
       requestPlayWithRetries();
     }
   };
