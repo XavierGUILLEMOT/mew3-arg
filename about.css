@@ -29,9 +29,14 @@
   box-shadow:0 0 12px rgba(0,255,156,0.5);
 }
 
+.about-container .mew3-link{
+  display:block;
+  text-align:center;
+}
+
 .about-logo{
   max-width:260px;
-  display:block;
+  display:inline-block;
   margin:0 auto 10px;
 }
 

@@ -165,7 +165,7 @@ transparent 3px
 );
 background-size:100% 3px;
 pointer-events:none;
-z-index:10;
+z-index:1;
 }
 
 .lang-switcher{
