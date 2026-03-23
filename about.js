@@ -152,22 +152,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   applyLanguage(currentLanguage);
 
-  // Auto-fill person photos from Instagram username via data attribute
+  // Load person photos from data-photo attribute (local files in photos/)
   document.querySelectorAll(".person-card").forEach(function (card) {
-    var igLink = card.querySelector(".person-link-ig");
-    if (!igLink) return;
-    var href = igLink.getAttribute("href") || "";
-    var match = href.match(/instagram\.com\/([a-zA-Z0-9_.]{2,})/);
-    if (!match || !match[1]) return;
-    var username = match[1];
     var photoDiv = card.querySelector(".person-photo");
     if (!photoDiv) return;
     var img = photoDiv.querySelector("img");
     if (!img) return;
-
-    // Try unavatar.io (aggregates multiple sources)
-    var src = "https://unavatar.io/" + username + "?fallback=false";
-    img.setAttribute("src", src);
+    var photoSrc = card.getAttribute("data-photo");
+    if (photoSrc) {
+      img.setAttribute("src", photoSrc);
+      img.onerror = function () {
+        this.removeAttribute("src");
+      };
+    }
+  });
     img.onerror = function () {
       // Fallback: hide image, show placeholder
       this.style.display = "none";
