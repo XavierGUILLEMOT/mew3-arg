@@ -35,7 +35,7 @@ const I18N_ABOUT = {
     djsTitle: "> DJs & ARTISTES",
     djsIntro: "Ceux qui ont partagé leur son avec nous.",
     contactTitle: "> CONTACT",
-    footerLine: "MEW3 — VOUS ÊTES OBSERVÉ MAINTENANT"
+    footerLine: "MEW3 2026"
   },
   en: {
     pageTitle: "MEW3 — WHO ARE WE?",
@@ -67,7 +67,7 @@ const I18N_ABOUT = {
     djsTitle: "> DJs & ARTISTS",
     djsIntro: "Those who shared their sound with us.",
     contactTitle: "> CONTACT",
-    footerLine: "MEW3 — YOU ARE WATCHING NOW"
+    footerLine: "MEW3 — 2026"
   }
 };
 

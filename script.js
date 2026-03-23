@@ -27,11 +27,11 @@ let currentLanguage = "fr";
 
 const I18N = {
   fr: {
-    pageTitle: "VOUS ÊTES OBSERVÉ MAINTENANT",
-    pageDescription: "VOUS ÊTES OBSERVÉ. Plusieurs clés sont cachées. Premier arrivé, premier servi.",
-    ogTitle: "MEW3 - VOUS ÊTES OBSERVÉ MAINTENANT",
+    pageTitle: "YOU ARE WATCHING NOW",
+    pageDescription: "YOU ARE WATCHING. Plusieurs clés sont cachées. Premier arrivé, premier servi.",
+    ogTitle: "MEW3 - YOU ARE WATCHING NOW",
     ogDescription: "Plusieurs clés sont cachées. Premier arrivé, premier servi. Les trouverez-vous ?",
-    twitterTitle: "MEW3 - VOUS ÊTES OBSERVÉ MAINTENANT",
+    twitterTitle: "MEW3 - YOU ARE WATCHING NOW",
     twitterDescription: "Plusieurs clés sont cachées. Premier arrivé, premier servi. Les trouverez-vous ?",
     langLabel: "Langue",
     inAppCornerHintLabel: "OUVRIR DANS LE NAVIGATEUR",
@@ -40,7 +40,7 @@ const I18N = {
     nextBtnAria: "Lire la piste suivante",
     muteBtnAria: "Activer ou couper l'audio",
     nowPlayingPrefix: "Lecture",
-    bootText: "> CONNECTÉ À MEW3.ONLINE </br>\n> VOUS OBSERVEZ </br>\n> PLUSIEURS CLÉS SONT CACHÉES. QUELQUE PART. </br>\n> PREMIER ARRIVÉ, PREMIER SERVI. </br>\n> LES TROUVEREZ-VOUS ?",
+    bootText: "> CONNECTÉ À MEW3.ONLINE </br>\n> YOU ARE WATCHING </br>\n> PLUSIEURS CLÉS SONT CACHÉES. QUELQUE PART. </br>\n> PREMIER ARRIVÉ, PREMIER SERVI. </br>\n> LES TROUVEREZ-VOUS ?",
     accessTitle: "ENTRER LE CODE",
     codeInputPlaceholder: "CLÉ D'ACCÈS",
     verifyBtn: "VÉRIFIER",
