@@ -1,0 +1,256 @@
+/* === ABOUT PAGE === */
+
+.about-container{
+  position:relative;
+  z-index:2;
+  max-width:700px;
+  width:94%;
+  margin:0 auto;
+  padding:40px 0 60px;
+}
+
+.back-link{
+  display:inline-block;
+  color:#00ff9c;
+  text-decoration:none;
+  font-family:monospace;
+  font-size:13px;
+  letter-spacing:1px;
+  padding:8px 14px;
+  border:1px solid rgba(0,255,156,0.4);
+  background:rgba(0,0,0,0.6);
+  transition:all 0.2s;
+  margin-bottom:24px;
+}
+
+.back-link:hover{
+  background:#00ff9c;
+  color:#000;
+  box-shadow:0 0 12px rgba(0,255,156,0.5);
+}
+
+.about-logo{
+  max-width:260px;
+  display:block;
+  margin:0 auto 10px;
+}
+
+.about-title{
+  font-family:monospace;
+  font-size:28px;
+  letter-spacing:3px;
+  color:#00ff9c;
+  text-align:center;
+  margin:0 0 40px;
+  text-shadow:0 0 20px rgba(0,255,156,0.4);
+}
+
+/* Sections */
+
+.about-section{
+  margin-bottom:40px;
+  padding:24px;
+  border:1px solid rgba(0,255,156,0.15);
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(2px);
+}
+
+.section-title{
+  font-family:monospace;
+  font-size:16px;
+  letter-spacing:2px;
+  color:#00ff9c;
+  margin:0 0 16px;
+  padding-bottom:8px;
+  border-bottom:1px solid rgba(0,255,156,0.2);
+}
+
+.section-content p,
+.section-intro{
+  font-family:monospace;
+  font-size:13px;
+  line-height:1.7;
+  color:#9effd7;
+  margin:0;
+  opacity:0.9;
+}
+
+.section-intro{
+  margin-bottom:16px;
+}
+
+/* Values */
+
+.values-list{
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+
+.values-list li{
+  font-family:monospace;
+  font-size:13px;
+  line-height:1.6;
+  color:#9effd7;
+  padding:8px 0;
+  border-bottom:1px solid rgba(0,255,156,0.08);
+}
+
+.values-list li:last-child{
+  border-bottom:none;
+}
+
+.value-icon{
+  color:#00ff9c;
+  margin-right:6px;
+}
+
+.values-list strong{
+  color:#00ff9c;
+}
+
+/* People Grid */
+
+.people-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+  gap:12px;
+}
+
+.person-card{
+  border:1px solid rgba(0,255,156,0.25);
+  background:rgba(0,255,156,0.03);
+  padding:16px;
+  text-align:center;
+  transition:all 0.2s;
+}
+
+.person-card:hover{
+  border-color:#00ff9c;
+  box-shadow:0 0 12px rgba(0,255,156,0.15);
+  background:rgba(0,255,156,0.06);
+}
+
+.person-alias{
+  font-family:monospace;
+  font-size:14px;
+  font-weight:bold;
+  color:#00ff9c;
+  letter-spacing:1px;
+  margin-bottom:4px;
+}
+
+.person-role{
+  font-family:monospace;
+  font-size:11px;
+  color:#9effd7;
+  opacity:0.7;
+  letter-spacing:0.5px;
+}
+
+/* DJ Grid */
+
+.dj-grid{
+  grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
+}
+
+.dj-card{
+  padding:12px;
+}
+
+.dj-card .person-alias{
+  font-size:13px;
+}
+
+/* Adherent counter */
+
+.adherent-counter{
+  margin-top:16px;
+  font-family:monospace;
+  font-size:15px;
+  color:#00ff9c;
+  text-align:center;
+  letter-spacing:1px;
+}
+
+/* Contact */
+
+.contact-links{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.contact-link{
+  color:#00ff9c;
+  text-decoration:none;
+  font-family:monospace;
+  font-size:13px;
+  letter-spacing:1px;
+  padding:10px 16px;
+  border:1px solid rgba(0,255,156,0.3);
+  transition:all 0.2s;
+}
+
+.contact-link:hover{
+  background:#00ff9c;
+  color:#000;
+  box-shadow:0 0 12px rgba(0,255,156,0.4);
+}
+
+/* Footer */
+
+.about-footer{
+  text-align:center;
+  margin-top:40px;
+  padding-top:20px;
+  border-top:1px solid rgba(0,255,156,0.15);
+}
+
+.footer-line{
+  font-family:monospace;
+  font-size:11px;
+  color:#9effd7;
+  opacity:0.5;
+  letter-spacing:2px;
+}
+
+/* Responsive */
+
+@media (max-width:600px){
+  .about-container{
+    padding:24px 0 40px;
+  }
+
+  .about-title{
+    font-size:20px;
+    letter-spacing:2px;
+    margin-bottom:28px;
+  }
+
+  .about-section{
+    padding:16px;
+    margin-bottom:24px;
+  }
+
+  .section-title{
+    font-size:14px;
+  }
+
+  .people-grid{
+    grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
+    gap:8px;
+  }
+
+  .dj-grid{
+    grid-template-columns:repeat(auto-fill, minmax(110px, 1fr));
+  }
+
+  .person-card{
+    padding:12px;
+  }
+
+  .about-logo{
+    max-width:200px;
+  }
+}

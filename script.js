@@ -45,6 +45,7 @@ const I18N = {
     codeInputPlaceholder: "CLÉ D'ACCÈS",
     verifyBtn: "VÉRIFIER",
     ticketLabel: "BILLETS - CO2 - NANTES - 02/04/2026",
+    aboutLinkLabel: "QUI SOMMES-NOUS ?",
     subjectsLabel: "SUJETS IDENTIFIÉS",
     recentSubjectsTitle: "SUJETS RÉCENTS",
     popupTitle: "IDENTIFICATION DU SUJET REQUISE",
@@ -92,6 +93,7 @@ const I18N = {
     codeInputPlaceholder: "ACCESS KEY",
     verifyBtn: "VERIFY",
     ticketLabel: "GET TICKETS - CO2 - NANTES - 02/04/2026",
+    aboutLinkLabel: "WHO ARE WE?",
     subjectsLabel: "SUBJECTS IDENTIFIED",
     recentSubjectsTitle: "RECENT SUBJECTS",
     popupTitle: "SUBJECT IDENTIFICATION REQUIRED",
@@ -173,6 +175,7 @@ function applyLanguage(lang){
   setText("accessTitle", "accessTitle");
   setText("verifyBtn", "verifyBtn");
   setText("ticketLabel", "ticketLabel");
+  setText("aboutLinkLabel", "aboutLinkLabel");
   setText("subjectsLabel", "subjectsLabel");
   setText("recentSubjectsTitle", "recentSubjectsTitle");
   setText("popupTitle", "popupTitle");
