@@ -164,11 +164,10 @@
   object-fit:cover;
   position:relative;
   z-index:1;
-  display:none;
 }
 
-.person-photo img[src]{
-  display:block;
+.person-photo img:not([src]){
+  display:none;
 }
 
 .person-alias{

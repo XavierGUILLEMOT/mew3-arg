@@ -166,10 +166,4 @@ document.addEventListener("DOMContentLoaded", function () {
       };
     }
   });
-    img.onerror = function () {
-      // Fallback: hide image, show placeholder
-      this.style.display = "none";
-      photoDiv.classList.add("no-photo");
-    };
-  });
 });
