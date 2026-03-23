@@ -14,17 +14,17 @@ const I18N_ABOUT = {
     historyText:
       "MEW3 est né d'une envie simple : créer un espace où la musique électronique underground " +
       "peut exister librement, sans compromis. Fondé à Nantes, le collectif rassemble des " +
-      "passionnés de son, de technologie et de culture rave." +
+      "passionnés de son, d'arts visuels, de technologie et de cultures alternatives ( Comme la Free party)." +
       "<br><br>" +
       "Ce qui a commencé comme des soirées entre amis s'est transformé en un mouvement : " +
-      "des événements immersifs, une identité visuelle forte, et une communauté qui grandit " +
-      "dans l'ombre — connectée, engagée, curieuse.",
+      "des événements immersifs, une identité visuelle, et une communauté qui grandit " +
+      "dans l'ombre. Connectée, engagée, curieuse.",
     valuesTitle: "> VALEURS",
-    value1: "Underground avant tout — La musique est au centre. Pas les ego, pas le marketing.",
-    value2: "Communauté — Chaque personne présente fait partie de l'expérience.",
-    value3: "Accessibilité — Des événements ouverts, des prix justes, un espace safe.",
-    value4: "Expérimentation — Mélanger les genres, casser les codes, explorer les limites.",
-    value5: "Transparence — On partage ce qu'on fait, comment et pourquoi.",
+    value1: "Underground avant tout  La création est au centre. Pas les ego, pas le marketing.",
+    value2: "Communauté  Chaque personne présente fait partie de l'expérience.",
+    value3: "Accessibilité  Des événements ouverts, des prix justes, un espace safe.",
+    value4: "Expérimentation  Mélanger les genres, casser les codes, explorer les limites.",
+    value5: "Transparence  On partage ce qu'on fait, comment et pourquoi.",
     foundersTitle: "> FONDATEURS",
     membersTitle: "> MEMBRES",
     adherentsTitle: "> ADHÉRENTS",
@@ -46,11 +46,11 @@ const I18N_ABOUT = {
     historyText:
       "MEW3 was born from a simple desire: to create a space where underground electronic music " +
       "can exist freely, without compromise. Founded in Nantes, the collective brings together " +
-      "enthusiasts of sound, technology and rave culture." +
+      "enthusiasts of sound, visual arts, technology and alternative cultures (such as Free parties)." +
       "<br><br>" +
       "What started as parties between friends turned into a movement: " +
-      "immersive events, a strong visual identity, and a community growing " +
-      "in the shadows — connected, engaged, curious.",
+      "immersive events, a visual identity, and a community growing " +
+      "in the shadows. Connected, engaged, curious.",
     valuesTitle: "> VALUES",
     value1: "Underground first — Music is at the center. Not egos, not marketing.",
     value2: "Community — Every person present is part of the experience.",
