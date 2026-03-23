@@ -151,4 +151,20 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   applyLanguage(currentLanguage);
+
+  // Auto-fill person photos from Instagram links via unavatar.io
+  document.querySelectorAll(".person-card").forEach(function (card) {
+    var igLink = card.querySelector(".person-link-ig");
+    if (!igLink) return;
+    var href = igLink.getAttribute("href") || "";
+    var match = href.match(/instagram\.com\/([a-zA-Z0-9_.]+)/);
+    if (!match || !match[1]) return;
+    var username = match[1];
+    var photoDiv = card.querySelector(".person-photo");
+    if (!photoDiv) return;
+    var img = photoDiv.querySelector("img");
+    if (img && !img.getAttribute("src")) {
+      img.setAttribute("src", "https://unavatar.io/instagram/" + username);
+    }
+  });
 });
