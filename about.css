@@ -148,22 +148,27 @@
   align-items:center;
   justify-content:center;
   background:rgba(0,255,156,0.05);
+  position:relative;
+}
+
+.person-photo::after{
+  content:"▣";
+  font-size:28px;
+  color:rgba(0,255,156,0.3);
+  position:absolute;
 }
 
 .person-photo img{
   width:100%;
   height:100%;
   object-fit:cover;
-}
-
-.person-photo.no-photo{
   position:relative;
+  z-index:1;
+  display:none;
 }
 
-.person-photo.no-photo::after{
-  content:"▣";
-  font-size:28px;
-  color:rgba(0,255,156,0.3);
+.person-photo img[src]{
+  display:block;
 }
 
 .person-alias{
