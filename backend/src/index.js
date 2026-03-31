@@ -84,6 +84,43 @@ async function hashIp(ip, env) {
   return sha256Hex(`${ip}::${pepper}`);
 }
 
+async function sendNotificationEmail(env, { username, firstName, lastName, email, codeLabel }) {
+  const apiKey = env.RESEND_API_KEY;
+  const to = env.NOTIFICATION_EMAIL;
+  if (!apiKey || !to) return;
+
+  const subject = `MEW3 — Nouveau code trouvé par ${username}`;
+  const html = [
+    `<h2>Un sujet a trouvé un code !</h2>`,
+    `<ul>`,
+    `<li><strong>Username :</strong> ${username}</li>`,
+    `<li><strong>Prénom :</strong> ${firstName}</li>`,
+    `<li><strong>Nom :</strong> ${lastName}</li>`,
+    `<li><strong>Email :</strong> ${email}</li>`,
+    codeLabel ? `<li><strong>Code :</strong> ${codeLabel}</li>` : "",
+    `<li><strong>Date :</strong> ${new Date().toISOString()}</li>`,
+    `</ul>`,
+  ].join("\n");
+
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "MEW3 <onboarding@resend.dev>",
+        to: [to],
+        subject,
+        html,
+      }),
+    });
+  } catch (_e) {
+    // Notification failure must not break the claim flow.
+  }
+}
+
 async function verifyCode(code, env) {
   const codeHash = await hashCode(code, env);
   const codeRow = await env.DB.prepare(
@@ -147,7 +184,7 @@ async function findOrCreateUser(env, username, firstName, lastName, email) {
   return created.meta.last_row_id;
 }
 
-async function handleRegister(request, env, cors) {
+async function handleRegister(request, env, cors, ctx) {
   const body = await request.json().catch(() => ({}));
   const username = sanitizeUsername(body.username);
   const firstName = sanitizeNamePart(body.firstName);
@@ -194,6 +231,22 @@ async function handleRegister(request, env, cors) {
   await env.DB.prepare(`INSERT INTO claims (user_id, code_id, ip_hash, user_agent) VALUES (?, ?, ?, ?)`) 
     .bind(userId, verification.codeId, ipHash, userAgent)
     .run();
+
+  // Fetch code label for the notification email.
+  const codeRow = await env.DB.prepare(`SELECT label FROM access_codes WHERE id = ?`)
+    .bind(verification.codeId)
+    .first();
+
+  const emailPromise = sendNotificationEmail(env, {
+    username,
+    firstName,
+    lastName,
+    email,
+    codeLabel: codeRow?.label || "(sans label)",
+  });
+  if (ctx && ctx.waitUntil) {
+    ctx.waitUntil(emailPromise);
+  }
 
   return json({ ok: true, message: "registered" }, 200, cors);
 }
@@ -359,7 +412,7 @@ async function handleAdminListClaims(url, env, cors) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const cors = corsHeaders(request.headers.get("origin") || "", env);
     try {
@@ -380,7 +433,7 @@ export default {
       }
 
       if (request.method === "POST" && url.pathname === "/api/register") {
-        return await handleRegister(request, env, cors);
+        return await handleRegister(request, env, cors, ctx);
       }
 
       if (request.method === "GET" && url.pathname === "/api/stats") {
