@@ -335,12 +335,13 @@ function updateAudioButtonLabel() {
   }
 }
 
-function initWidget() {
-  const iframe = document.getElementById("scPlayer");
-  if (!iframe || !window.SC || !window.SC.Widget) return;
-  scWidget = window.SC.Widget(iframe);
+function bindWidgetEvents(autoPlay) {
+  if (!scWidget) return;
   scWidget.bind(window.SC.Widget.Events.READY, () => {
     scWidget.setVolume(SOUND_VOLUME);
+    if (autoPlay) {
+      scWidget.play();
+    }
   });
   scWidget.bind(window.SC.Widget.Events.PLAY, () => {
     isPlaying = true;
@@ -360,6 +361,13 @@ function initWidget() {
   });
 }
 
+function initWidget() {
+  const iframe = document.getElementById("scPlayer");
+  if (!iframe || !window.SC || !window.SC.Widget) return;
+  scWidget = window.SC.Widget(iframe);
+  bindWidgetEvents(false);
+}
+
 function toggleMute() {
   if (!scWidget) return;
   hasStarted = true;
@@ -375,7 +383,8 @@ function nextTrack() {
   currentTrackIndex = currentTrackIndex < 0 ? 0 : (currentTrackIndex + 1) % playlist.length;
   currentTrack = playlist[currentTrackIndex];
   updateNowPlaying();
-  scWidget.load(currentTrack.url, { auto_play: true, show_comments: false, show_user: false, show_reposts: false, visual: false });
+  scWidget.load(currentTrack.url, { auto_play: false, show_comments: false, show_user: false, show_reposts: false, visual: false });
+  bindWidgetEvents(true);
 }
 
 window.onload = function(){
