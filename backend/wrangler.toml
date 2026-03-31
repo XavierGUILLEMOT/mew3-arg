@@ -5,7 +5,6 @@ account_id = "f88421fe8b5bab095e341dd58dc85142"
 
 [vars]
 ALLOWED_ORIGINS = "https://mew3.online,https://www.mew3.online,https://xavierguillemot.github.io"
-NOTIFICATION_EMAIL = "mew3.sound@gmail.com"
 
 [[d1_databases]]
 binding = "DB"
