@@ -199,7 +199,7 @@ async function handleRegister(request, env, cors) {
 }
 
 async function handleStats(env, cors) {
-  const totalRow = await env.DB.prepare(`SELECT COUNT(*) AS total FROM claims`).first();
+  const totalRow = await env.DB.prepare(`SELECT COUNT(*) AS total FROM users`).first();
   const users = await env.DB.prepare(
     `SELECT username
      FROM users
