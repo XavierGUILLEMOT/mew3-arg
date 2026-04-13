@@ -200,19 +200,17 @@ async function handleRegister(request, env, cors) {
 
 async function handleStats(env, cors) {
   const totalRow = await env.DB.prepare(`SELECT COUNT(*) AS total FROM claims`).first();
-  const recent = await env.DB.prepare(
-    `SELECT u.username, c.created_at
-     FROM claims c
-     JOIN users u ON u.id = c.user_id
-     ORDER BY c.id DESC
-     LIMIT 5`
+  const users = await env.DB.prepare(
+    `SELECT username
+     FROM users
+     ORDER BY id DESC`
   ).all();
 
   return json(
     {
       ok: true,
       total: totalRow?.total || 0,
-      recent: (recent.results || []).map((r) => ({ username: r.username, createdAt: r.created_at })),
+      users: (users.results || []).map((r) => ({ username: r.username })),
     },
     200,
     cors

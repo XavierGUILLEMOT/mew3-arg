@@ -47,7 +47,7 @@ const I18N = {
     ticketLabel: "BILLETS - CO2 - NANTES - 02/04/2026",
     aboutLinkLabel: "QUI SOMMES-NOUS ?",
     subjectsLabel: "SUJETS IDENTIFIÉS",
-    recentSubjectsTitle: "SUJETS RÉCENTS",
+    recentSubjectsTitle: "LISTE DES SUJETS",
     popupTitle: "IDENTIFICATION DU SUJET REQUISE",
     usernamePlaceholder: "Nom d'utilisateur",
     firstNamePlaceholder: "Prénom",
@@ -95,7 +95,7 @@ const I18N = {
     ticketLabel: "GET TICKETS - CO2 - NANTES - 02/04/2026",
     aboutLinkLabel: "WHO ARE WE?",
     subjectsLabel: "SUBJECTS IDENTIFIED",
-    recentSubjectsTitle: "RECENT SUBJECTS",
+    recentSubjectsTitle: "SUBJECT LIST",
     popupTitle: "SUBJECT IDENTIFICATION REQUIRED",
     usernamePlaceholder: "Username",
     firstNamePlaceholder: "First name",
@@ -298,7 +298,7 @@ async function refreshStats() {
   try {
     const stats = await apiFetch("/api/stats", { method: "GET", headers: {} });
     document.getElementById("subjectCount").innerText = String(stats.total || 0);
-    updateSubjectsList((stats.recent || []).map((r) => r.username));
+    updateSubjectsList((stats.users || []).map((r) => r.username));
   } catch (_e) {
     // Keep existing UI placeholders when backend is unavailable.
   }
