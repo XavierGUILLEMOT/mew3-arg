@@ -298,7 +298,8 @@ async function refreshStats() {
   try {
     const stats = await apiFetch("/api/stats", { method: "GET", headers: {} });
     document.getElementById("subjectCount").innerText = String(stats.total || 0);
-    updateSubjectsList((stats.users || []).map((r) => r.username));
+    const rows = stats.users || stats.recent || [];
+    updateSubjectsList(rows.map((r) => r.username));
   } catch (_e) {
     // Keep existing UI placeholders when backend is unavailable.
   }
