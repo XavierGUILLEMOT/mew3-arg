@@ -4,8 +4,86 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MEW3 - En construction</title>
+  <style>
+    :root {
+      --bg-1: #070b12;
+      --bg-2: #0f1e2f;
+      --text: #e8edf4;
+      --muted: #9fb0c3;
+      --accent: #7df7e5;
+      --accent-2: #39b8ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--text);
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(125, 247, 229, 0.14), transparent 60%),
+        radial-gradient(900px 500px at 100% 110%, rgba(57, 184, 255, 0.16), transparent 60%),
+        linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 100%);
+    }
+
+    .wrap {
+      width: min(720px, 100%);
+      text-align: center;
+      border: 1px solid rgba(232, 237, 244, 0.14);
+      background: rgba(7, 11, 18, 0.55);
+      backdrop-filter: blur(6px);
+      border-radius: 16px;
+      padding: 40px 24px;
+    }
+
+    h1 {
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: clamp(1.6rem, 5vw, 2.6rem);
+      line-height: 1.2;
+    }
+
+    p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.7vw, 1.15rem);
+    }
+
+    .arg-btn {
+      display: inline-block;
+      margin-top: 28px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(125, 247, 229, 0.5);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      background: linear-gradient(90deg, rgba(125, 247, 229, 0.22), rgba(57, 184, 255, 0.22));
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .arg-btn:hover,
+    .arg-btn:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(125, 247, 229, 0.9);
+      background: linear-gradient(90deg, rgba(125, 247, 229, 0.3), rgba(57, 184, 255, 0.3));
+      outline: none;
+    }
+  </style>
 </head>
 <body>
-  <p>en cours de construction, revenez plus tard</p>
+  <main class="wrap">
+    <h1>En cours de construction</h1>
+    <p>Revenez plus tard.</p>
+    <a class="arg-btn" href="/arg">Accéder à l'ARG</a>
+  </main>
 </body>
 </html>
