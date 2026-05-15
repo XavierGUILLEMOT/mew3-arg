@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEW3 — Galerie</title>
+  <meta name="description" content="Archives photo et vidéo des nuits MEW3. Trace de ce qui a eu lieu.">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="nav">
+    <a href="index.html" class="nav__logo" aria-label="MEW3 — Accueil">
+      <img src="websitelogo.gif" alt="MEW3">
+    </a>
+    <nav class="nav__links" aria-label="Navigation principale">
+      <a href="collectif.html">Collectif</a>
+      <a href="agenda.html">Agenda</a>
+      <a href="galerie.html">Galerie</a>
+      <a href="shop.html">Shop</a>
+      <a href="arg/" class="nav__arg" data-text="//ARG">//ARG</a>
+      <a href="faq.html">FAQ</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <button class="nav__burger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main class="page__main">
+    <header class="page__header">
+      <span class="page__index">03 // GALERIE</span>
+      <h1 class="page__title">Galerie</h1>
+      <p class="page__intro">Douze nuits depuis octobre 2024. De Hello World à Vertigo. Photos N&amp;B au repos, couleur au survol. Les galeries se remplissent au fil du temps.</p>
+    </header>
+
+    <div class="page__body">
+
+      <section class="page__section">
+        <h2>12 nuits — 2024 / 2026</h2>
+        <div class="archive-filter" role="group" aria-label="Filtrer les soirées">
+          <button class="archive-filter__btn is-active" data-filter="all" type="button">Tout</button>
+          <button class="archive-filter__btn" data-filter="mainline" type="button">Mainline</button>
+          <button class="archive-filter__btn" data-filter="before" type="button">Before</button>
+        </div>
+        <div class="past__grid">
+          <article class="past-card" data-category="mainline">
+            <div class="past-card__img" style="background-image:url('photos/archives/12-vertigo/cover.jpg');"></div>
+            <div class="past-card__meta"><span class="past-card__num">#12</span><span class="past-card__date">09.05.2026</span></div>
+            <h3 class="past-card__title">Vertigo</h3>
+            <span class="past-card__lieu">CO2 Underground, Nantes</span>
+          </article>
+          <article class="past-card" data-category="mainline">
+            <div class="past-card__img" style="background-image:url('photos/archives/11-mew3-is-watching/cover.jpg');"></div>
+            <div class="past-card__meta"><span class="past-card__num">#11</span><span class="past-card__date">02.04.2026</span></div>
+            <h3 class="past-card__title">MEW3 Is Watching</h3>
+            <span class="past-card__lieu">CO2 Underground, Nantes</span>
+          </article>
+          <article class="past-card" data-category="before">
+            <div class="past-card__img" style="background-image:url('photos/archives/10-dream-garden/cover.jpg');"></div>
+            <div class="past-card__meta"><span class="past-card__num">#10</span><span class="past-card__date">29.11.2025</span></div>
+            <h3 class="past-card__title">Dream Garden</h3>
+            <span class="past-card__lieu">Stony Safari, Nantes</span>
+          </article>
+          <article class="past-card" data-category="mainline">
+            <div class="past-card__img" style="background-image:url('photos/archives/09-radiance/cover.jpg');"></div>
+            <div class="past-card__meta"><span class="past-card__num">#09</span><span class="past-card__date">13.11.2025</span></div>
+            <h3 class="past-card__title">Radiance</h3>
+            <span class="past-card__lieu">Warehouse, Nantes</span>
+          </article>
+          <article class="past-card" data-category="before">
+            <div class="past-card__img" style="background-image:url('photos/archives/08-premiere-vague/cover.jpg');"></div>
+            <div class="past-card__meta"><span class="past-card__num">#08</span><span class="past-card__date">16.08.2025</span></div>
+            <h3 class="past-card__title">Première Vague</h3>
+            <span class="past-card__lieu">Le Papillon Bleu, Nantes</span>
+          </article>
+          <article class="past-card" data-category="mainline">
+            <div class="past-card__img" style="background-image:url('photos/archives/07-mew3-online/cover.jpg');"></div>
+            <div class="past-card__meta"><span class="past-card__num">#07</span><span class="past-card__date">22.05.2025</span></div>
+            <h3 class="past-card__title">MEW3 Online</h3>
+            <span class="past-card__lieu">Warehouse, Nantes</span>
+          </article>
+          <article class="past-card" data-category="mainline">
+            <div class="past-card__img" style="background-image:url('photos/archives/06-back-to-basics/cover.jpg');"></div>
+            <div class="past-card__meta"><span class="past-card__num">#06</span><span class="past-card__date">16.05.2025</span></div>
+            <h3 class="past-card__title">Back To Basics x Shield</h3>
+            <span class="past-card__lieu">CO2 Underground, Nantes</span>
+          </article>
+          <article class="past-card" data-category="mainline">
+            <div class="past-card__img" style="background-image:url('photos/archives/05-tyrosound-2/cover.jpg');"></div>
+            <div class="past-card__meta"><span class="past-card__num">#05</span><span class="past-card__date">07.05.2025</span></div>
+            <h3 class="past-card__title">Tyrosound 2</h3>
+            <span class="past-card__lieu">Secret Place, Nantes</span>
+          </article>
+          <article class="past-card" data-category="before">
+            <div class="past-card__img" style="background-image:url('photos/archives/04-banana-split/cover.jpg');"></div>
+            <div class="past-card__meta"><span class="past-card__num">#04</span><span class="past-card__date">18.04.2025</span></div>
+            <h3 class="past-card__title">Banana Split #4</h3>
+            <span class="past-card__lieu">L'Agronaute, Nantes</span>
+          </article>
+          <article class="past-card" data-category="mainline">
+            <div class="past-card__img" style="background-image:url('photos/archives/03-substation/cover.jpg');"></div>
+            <div class="past-card__meta"><span class="past-card__num">#03</span><span class="past-card__date">01.02.2025</span></div>
+            <h3 class="past-card__title">Substation</h3>
+            <span class="past-card__lieu">MESS Bar Club, Nantes</span>
+          </article>
+          <article class="past-card" data-category="before">
+            <div class="past-card__img" style="background-image:url('photos/archives/02-asphalte/cover.jpg');"></div>
+            <div class="past-card__meta"><span class="past-card__num">#02</span><span class="past-card__date">19.12.2024</span></div>
+            <h3 class="past-card__title">Asphalte</h3>
+            <span class="past-card__lieu">Ruin Bar, Nantes</span>
+          </article>
+          <article class="past-card" data-category="mainline">
+            <div class="past-card__img" style="background-image:url('photos/archives/01-hello-world/cover.jpg');"></div>
+            <div class="past-card__meta"><span class="past-card__num">#01</span><span class="past-card__date">03.10.2024</span></div>
+            <h3 class="past-card__title">Hello World</h3>
+            <span class="past-card__lieu">Décadanse, Nantes</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="page__section">
+        <h2>Tu étais là ?</h2>
+        <p>Si tu as photographié ou filmé une de nos nuits et que tu veux contribuer à la galerie, écris-nous : <a href="mailto:mew3.sound@gmail.com">mew3.sound@gmail.com</a>. On crédite, on ne pille pas.</p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__cols">
+      <div class="footer__col">
+        <span class="footer__col-title">EXPLORE</span>
+        <a href="collectif.html">Collectif</a>
+        <a href="agenda.html">Agenda</a>
+        <a href="galerie.html">Galerie</a>
+        <a href="shop.html">Shop</a>
+      </div>
+      <div class="footer__col">
+        <span class="footer__col-title">INFO</span>
+        <a href="faq.html">FAQ</a>
+        <a href="contact.html">Contact</a>
+        <a href="pro.html">Presse &amp; Booking</a>
+      </div>
+      <div class="footer__col">
+        <span class="footer__col-title">SUIVRE</span>
+        <a href="#" target="_blank" rel="noopener">Instagram</a>
+        <a href="#" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://shotgun.live/fr/organizers/mew-3" target="_blank" rel="noopener">Shotgun</a>
+      </div>
+      <div class="footer__col">
+        <span class="footer__col-title">LÉGAL</span>
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="confidentialite.html">Confidentialité</a>
+        <a href="cookies.html">Cookies</a>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <span>© MEW3 — ALL NIGHTS RESERVED</span>
+      <a href="arg/" class="footer__arg" title="?">
+        <span class="glitch-hover" data-text="////">////</span>
+      </a>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
