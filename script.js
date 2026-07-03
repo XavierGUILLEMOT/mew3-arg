@@ -3,7 +3,7 @@
 
   // CONFIG — à ajuster
   const NEXT_EVENT = {
-    date: '2026-05-16T19:30:00+02:00'  // SECONDE VAGUE @ Le Papillon Bleu, Nantes - sam. 16.05.2026 19H30 (CEST)
+    date: '2026-07-17T00:00:00+02:00'  // ECLIPSE @ CO2 Underground, Nantes - ven. 17.07.2026 00H00 (CEST)
   };
   const NEWSLETTER_ENDPOINT = '/api/newsletter';
 
